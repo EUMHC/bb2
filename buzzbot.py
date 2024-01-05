@@ -5,12 +5,13 @@ import string
 
 class Fixture:
 
-    def __init__(self, home_: str, away_: str, start_time_, umpires_required_: int):
+    def __init__(self, home_: str, away_: str, start_time_, umpires_required_: int, location_: str):
         assert 0 <= umpires_required_ <= 2
         self.home = home_
         self.away = away_
         self.start_time = start_time_
         self.end_time = self.start_time + datetime.timedelta(hours=1.5)
+        self.location = location_
         self.covering_team = ""
         self.umpires_required = umpires_required_
 
@@ -34,7 +35,9 @@ for i in range(0, number_of_matches):
     start_hour = random.randint(random_start_time, random_end_time)
     start_time = datetime.datetime.now().replace(hour=start_hour, minute=0, second=0, microsecond=0)
     umpires_required = random.randint(0, 2)
-    matches.append(Fixture(team1, random_opponent1, start_time, umpires_required))
+    locations = ["Peffermill", "GWC", "Glasgow Green", "Meggetland", "Aberdeen Sports Village"]
+    location = random.choice(locations)
+    matches.append(Fixture(team1, random_opponent1, start_time, umpires_required, location))
 
 umpiring_count = {team: 0 for team in teams}
 
@@ -116,4 +119,5 @@ buzzbot = BuzzBot(matches, teams, umpiring_count)
 buzzbot.assign_covering_teams()
 for match in matches:
     print(
-        f"{match.home} vs {match.away}, PB: {match.start_time}, END: {match.end_time} - Umpiring Team: {match.covering_team} providing {match.umpires_required} umpire(s)")
+        f"{match.home} vs {match.away}, PB: {match.start_time}, END: {match.end_time} @ {match.location} - Umpiring "
+        f"Team: {match.covering_team} providing {match.umpires_required} umpire(s)")

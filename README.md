@@ -7,6 +7,6 @@
 - [x] Doesn't select the playing team as the covering team
 - [x] Doesn't select teams that are playing in overlapping times
 - [x] Handles requiring no umpires and requiring 2 umpires
-- [ ] Add location to fixtures
+- [x] Add location to fixtures
   - [ ] Integrate travel time calculation and overlap checking using Google Maps API(?)
 - [ ] Handle having a teams as an away team in a fixture
