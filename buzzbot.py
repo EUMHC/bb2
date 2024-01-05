@@ -23,17 +23,17 @@ teams = ["1s", "2s", "3s", "4s", "5s", "6s", "7s"]
 # matches = [Fixture(teams[i], teams[j]) for i in range(len(teams)) for j in range(i + 1, len(teams))]
 
 
-# Random fixtures, only home assignments
+# Random fixtures, only home assignments, purely for testing purposes
 number_of_matches = 7
 matches = []
 playing_teams = random.sample(teams, number_of_matches)
 for i in range(0, number_of_matches):
     team1 = playing_teams[i]
-    random_opponent1 = ''.join(random.choices(string.ascii_uppercase + string.digits, k=3))
+    random_opponent1 = ''.join(random.choices(string.ascii_uppercase + string.digits, k=3))  # Random opponent name
     random_start_time, random_end_time = 11, 18  # 8AM & 8PM
     start_hour = random.randint(random_start_time, random_end_time)
     start_time = datetime.datetime.now().replace(hour=start_hour, minute=0, second=0, microsecond=0)
-    umpires_required = random.randint(1, 2)
+    umpires_required = random.randint(0, 2)
     matches.append(Fixture(team1, random_opponent1, start_time, umpires_required))
 
 umpiring_count = {team: 0 for team in teams}
@@ -45,7 +45,11 @@ class BuzzBot:
         self.teams = teams
         self.umpiring_count = umpiring_count
 
-    def assign_covering_teams(self):
+    def assign_covering_teams(self) -> None:
+        """
+        High level function called when all fixtures are to be assigned an umpire
+        :return: None
+        """
         for match in self.matches:
             if match.umpires_required == 0:
                 match.covering_team = "COVERED"
@@ -56,13 +60,23 @@ class BuzzBot:
             if selected_team != "No available umpire":
                 self.umpiring_count[selected_team] += match.umpires_required
 
-    def find_umpiring_team(self, match):
+    def find_umpiring_team(self, match: Fixture) -> str:
+        """
+        Finds the best team to cover a match based on defined criteria
+        :param match: Fixture object
+        :return: String name of the best team to cover a match
+        """
         eligible_teams = self.get_eligible_teams(match)
         if not eligible_teams:
             return "No available umpire"
         return sorted(eligible_teams, key=lambda x: self.umpiring_count[x])[0]
 
-    def get_eligible_teams(self, match):
+    def get_eligible_teams(self, match: Fixture) -> [str]:
+        """
+        Computes the list of teams eligible for covering a match
+        :param match: Fixture object representing the match
+        :return: List of strings representing the names of eligible teams
+        """
         teams_playing_same_day = self.get_teams_playing_same_day(match)
         eligible_playing_teams = [team for team in teams_playing_same_day if self.is_eligible(team, match)]
 
@@ -71,12 +85,24 @@ class BuzzBot:
         else:
             return [team for team in self.teams if team not in teams_playing_same_day and self.is_eligible(team, match)]
 
-    def get_teams_playing_same_day(self, match):
+    def get_teams_playing_same_day(self, match: Fixture) -> [str]:
+        """
+        # TODO - this could probably be indepented of argument match (almost certainly)
+        Computes the subset of teams playing that don't include the teams playing in the input match
+        :param match: Fixture object representing the match
+        :return: List of strings representing the names of teams playing
+        """
         teams_playing_same_day = {m.home for m in self.matches if m != match and m.home in self.teams}
         teams_playing_same_day.update({m.away for m in self.matches if m != match and m.away in self.teams})
         return teams_playing_same_day
 
-    def is_eligible(self, team, match):
+    def is_eligible(self, team: str, match: Fixture) -> bool:
+        """
+
+        :param team: Name as a string representing the team to check if eligible to umpire
+        :param match: Fixture object representing the match to check eligibility against.
+        :return: True if the team can cover umpiring, False if not
+        """
         if team in [match.home, match.away]:
             return False
         for other_match in self.matches:
@@ -90,4 +116,4 @@ buzzbot = BuzzBot(matches, teams, umpiring_count)
 buzzbot.assign_covering_teams()
 for match in matches:
     print(
-        f"{match.home} vs {match.away}, PB: {match.start_time}, END: {match.end_time} - Umpiring Team: {match.covering_team}")
+        f"{match.home} vs {match.away}, PB: {match.start_time}, END: {match.end_time} - Umpiring Team: {match.covering_team} providing {match.umpires_required} umpire(s)")
