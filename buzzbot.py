@@ -1,6 +1,19 @@
 import datetime
 import random
 import string
+import numpy as np
+
+
+class TransportMatrix:
+
+    def __init__(self, location_names, modes_of_transport):
+        self.num_locations = len(location_names)
+        self.num_modes = len(modes_of_transport)
+
+        self.locations = {name: index for index, name in enumerate(location_names)}
+        self.modes = {mode: index for index, mode in enumerate(modes_of_transport)}
+
+        self.matrix = np.full((self.num_locations, self.num_locations, self.num_modes), np.nan)
 
 
 class Fixture:
@@ -43,10 +56,10 @@ umpiring_count = {team: 0 for team in teams}
 
 
 class BuzzBot:
-    def __init__(self, matches, teams, umpiring_count):
-        self.matches = matches
-        self.teams = teams
-        self.umpiring_count = umpiring_count
+    def __init__(self, matches_, teams_, umpiring_count_):
+        self.matches = matches_
+        self.teams = teams_
+        self.umpiring_count = umpiring_count_
 
     def assign_covering_teams(self) -> None:
         """
@@ -90,7 +103,7 @@ class BuzzBot:
 
     def get_teams_playing_same_day(self, match: Fixture) -> [str]:
         """
-        # TODO - this could probably be indepented of argument match (almost certainly)
+        # TODO - this could probably be independent of argument match (almost certainly)
         Computes the subset of teams playing that don't include the teams playing in the input match
         :param match: Fixture object representing the match
         :return: List of strings representing the names of teams playing
@@ -117,7 +130,7 @@ class BuzzBot:
 # Usage
 buzzbot = BuzzBot(matches, teams, umpiring_count)
 buzzbot.assign_covering_teams()
-for match in matches:
+for match in buzzbot.matches:
     print(
         f"{match.home} vs {match.away}, PB: {match.start_time}, END: {match.end_time} @ {match.location} - Umpiring "
         f"Team: {match.covering_team} providing {match.umpires_required} umpire(s)")
