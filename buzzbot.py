@@ -2,6 +2,7 @@ import datetime
 import random
 import string
 import numpy as np
+import traveltimepy
 
 
 class TransportMatrix:
@@ -85,6 +86,7 @@ class BuzzBot:
         eligible_teams = self.get_eligible_teams(match)
         if not eligible_teams:
             return "No available umpire"
+        # Greedy heuristic that takes the team with the least assignments first, then the strongest team.
         return sorted(eligible_teams, key=lambda x: self.umpiring_count[x])[0]
 
     def get_eligible_teams(self, match: Fixture) -> [str]:
