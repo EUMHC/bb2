@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="cal" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="cal" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="buzzbot" project-jdk-type="Python SDK" />
 </project>

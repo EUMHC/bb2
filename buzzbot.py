@@ -2,7 +2,11 @@ import datetime
 import random
 import string
 import numpy as np
-import traveltimepy
+import warnings
+import utils
+
+from DistanceMatrixAPI import DistanceMatrixInterface, LocationManager
+from credentials import get_DistanceMatrix_credentials
 
 
 class TransportMatrix:
@@ -24,7 +28,7 @@ class Fixture:
         self.home = home_
         self.away = away_
         self.start_time = start_time_
-        self.end_time = self.start_time + datetime.timedelta(hours=1.5)
+        self.end_time = self.start_time + datetime.timedelta(hours=1.5)  # Length of a hockey match is 1.5 hours
         self.location = location_
         self.covering_team = ""
         self.umpires_required = umpires_required_
@@ -42,6 +46,7 @@ teams = ["1s", "2s", "3s", "4s", "5s", "6s", "7s"]
 number_of_matches = 7
 matches = []
 playing_teams = random.sample(teams, number_of_matches)
+lm = LocationManager()
 for i in range(0, number_of_matches):
     team1 = playing_teams[i]
     random_opponent1 = ''.join(random.choices(string.ascii_uppercase + string.digits, k=3))  # Random opponent name
@@ -49,8 +54,7 @@ for i in range(0, number_of_matches):
     start_hour = random.randint(random_start_time, random_end_time)
     start_time = datetime.datetime.now().replace(hour=start_hour, minute=0, second=0, microsecond=0)
     umpires_required = random.randint(0, 2)
-    locations = ["Peffermill", "GWC", "Glasgow Green", "Meggetland", "Aberdeen Sports Village"]
-    location = random.choice(locations)
+    location = random.choice(list(lm.get_all_location_names()))
     matches.append(Fixture(team1, random_opponent1, start_time, umpires_required, location))
 
 umpiring_count = {team: 0 for team in teams}
@@ -61,10 +65,31 @@ class BuzzBot:
         self.matches = matches_
         self.teams = teams_
         self.umpiring_count = umpiring_count_
+        self.location_manager = LocationManager()
+        self.api = DistanceMatrixInterface(get_DistanceMatrix_credentials())
+        self.bootstrap_api()
+        self.travel_time_matrix = self.api.get_travel_time_matrix()
+
+    def extract_location_names(self) -> [str]:
+        return [m.location for m in self.matches]
+
+    def extract_location_coordinates(self, location_names_) -> [(float, float)]:
+        coords = []
+        for name in location_names_:
+            coord = self.location_manager.get_location(name)
+            coords.append(coord)
+        return coords
+
+    def bootstrap_api(self):
+        matchday_locations = self.extract_location_names()
+        matchday_locations_dict = self.location_manager.return_matchday_location_subdictionary(matchday_locations)
+        self.api.import_from_LocationManager(matchday_locations_dict)
+
 
     def assign_covering_teams(self) -> None:
         """
-        High level function called when all fixtures are to be assigned an umpire
+        High level function called when all fixtures are to be assigned an umpire. Each `match` instance in the list
+        `matches`, the assigned umpire is updated.
         :return: None
         """
         for match in self.matches:
@@ -126,13 +151,43 @@ class BuzzBot:
         for other_match in self.matches:
             if team in [other_match.home, other_match.away] and match.overlaps_with(other_match):
                 return False
+
+        for other_match in self.matches:
+            if team in [other_match.home, other_match.away]:
+                origin_cords = self.extract_location_coordinates([other_match.location])[0]
+                dest_cords = self.extract_location_coordinates([match.location])[0]
+                travel_time = self.get_travel_time(origin_cords, dest_cords)
+
+                travel_time_delta = datetime.timedelta(minutes=travel_time)
+                time_diff = abs(match.start_time - other_match.end_time)
+                print(f"time diff {time_diff}, travel time delta {travel_time_delta}")
+                if time_diff < travel_time_delta:
+                    return False
         return True
 
+    def get_travel_time(self, origin, destination):
+        origin = ",".join([str(x) for x in origin])
+        destination = ",".join(str(x) for x in destination)
+        travel_time = self.travel_time_matrix.at[origin, destination]
+        return travel_time // 60  # converts to minutes
 
-# Usage
-buzzbot = BuzzBot(matches, teams, umpiring_count)
-buzzbot.assign_covering_teams()
-for match in buzzbot.matches:
-    print(
-        f"{match.home} vs {match.away}, PB: {match.start_time}, END: {match.end_time} @ {match.location} - Umpiring "
-        f"Team: {match.covering_team} providing {match.umpires_required} umpire(s)")
+    def get_total_umpires_supplied(self):
+        return sum(self.umpiring_count.values())
+
+
+if __name__ == "__main__":
+
+    print(f"TheBuzzBot says, \"{utils.get_opening_tagline()}\"\n")
+
+    # Usage
+    buzzbot = BuzzBot(matches, teams, umpiring_count)
+    buzzbot.assign_covering_teams()
+    for match in buzzbot.matches:
+        print(
+            f"{match.home} vs {match.away}, PB: {match.start_time}, END: {match.end_time} @ {match.location} - Umpiring "
+            f"Team: {match.covering_team} providing {match.umpires_required} umpire(s)")
+
+    print(f"TOTAL UMPIRES SUPPLIED: {buzzbot.get_total_umpires_supplied()}")
+
+    warnings.warn("Always doublecheck and cross reference umpiring assignments given by The Buzzbot")
+    print(buzzbot.travel_time_matrix)
