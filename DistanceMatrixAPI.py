@@ -82,6 +82,7 @@ class DistanceMatrixInterface:
             return None
 
     def get_travel_time_table(self) -> dict:
+        print(("~" * 20) + " Initialising travel time table " + ("~" * 20))
         travel_times = {}
         for origin, destination in itertools.combinations(self.locations, 2):
             key = f"{origin.to_request_format()}_{destination.to_request_format()}"
@@ -100,6 +101,7 @@ class DistanceMatrixInterface:
                 travel_time = self.parse_response()
                 self.add_to_cache(key, travel_time)
                 travel_times[key] = travel_time
+        print("~" * 72)
         return travel_times
 
 
@@ -114,7 +116,12 @@ class LocationManager:
         self.locations[name_] = (latitude_, longitude_)
 
     def get_location(self, name: str) -> (float, float):
-        return self.locations.get(name)
+        location = self.locations.get(name)
+        if location is None:
+            raise KeyError(f"Location with name '{name}' not found in the Location Manager. Have you spelt the "
+                           f"location correctly? Please refer to locations.csv file for correct locations and "
+                           f"spellings.")
+        return location
 
     def get_all_locations(self) -> dict:
         return self.locations
@@ -134,7 +141,7 @@ class LocationManager:
     def return_matchday_location_subdictionary(self, locations: [str]) -> dict:
         """
         Returns key value pairs (location, latlongs) of the match day locations only
-        :param locations:
-        :return:
+        :param locations: the list of location names for match day fixtures
+        :return: dictionary of location names and latlong values
         """
         return {l: self.get_location(l) for l in locations}
