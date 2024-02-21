@@ -138,14 +138,3 @@ class LocationManager:
         :return:
         """
         return {l: self.get_location(l) for l in locations}
-
-# API_KEY = get_DistanceMatrix_credentials()
-# handler = DistanceMatrixInterface(API_KEY_=API_KEY)
-#
-# lm = LocationManager()
-#
-# matchday_locations = ["St Andrews University Sports Centre", "Peffermill", "Titwood (Clydesdale Home)"]
-# matchday_locations_dict = lm.return_matchday_location_subdictionary(matchday_locations)
-# handler.import_from_LocationManager(location_manager_dict=matchday_locations_dict)
-#
-# print(handler.get_travel_time_table())

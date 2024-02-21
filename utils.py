@@ -1,5 +1,6 @@
 import math
 import random
+import subprocess
 from datetime import timedelta
 
 
@@ -14,9 +15,17 @@ def get_opening_tagline():
         "Stand up if you hate the 1s",
         "Stand up if you hate the 2s",
         "The 2s are in their beds",
-        "See it off fresher!"
+        "See it off fresher!",
+        "CG chased Tash all the way to Florence!"
     ]
     return random.choice(taglines)
+
+
+def get_opening_tagline_with_cowsay():
+    tagline = get_opening_tagline()
+    command = ["cowsay", tagline]
+    result = subprocess.run(command, stdout=subprocess.PIPE, text=True)
+    print(result.stdout)
 
 
 def calculate_confidence(I: timedelta, T: timedelta, sf: float = 0.1) -> float:
