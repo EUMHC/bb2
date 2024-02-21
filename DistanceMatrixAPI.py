@@ -1,8 +1,9 @@
+import os
 import csv
+import itertools
 
 import requests
 import json
-import pandas as pd
 from credentials import get_DistanceMatrix_credentials
 
 
@@ -28,58 +29,78 @@ class DistanceMatrixInterface:
         self.locations: [DistanceMatrixLocation] = []
         self.request_url: str = ""
         self.json_response: dict = {}
+        self.number_of_requests = 0
+        self.cache_file: str = "distance_matrix_cache.json"
+        self.cache: dict = self.load_cache()
+
+    def load_cache(self) -> dict:
+        if os.path.exists(self.cache_file):
+            with open(self.cache_file, "r") as f:
+                return json.load(f)
+        else:
+            return {}
+
+    def save_cache(self) -> None:
+        with open(self.cache_file, "w") as f:
+            json.dump(self.cache, f)
+
+    def add_to_cache(self, key: str, time: int) -> None:
+        self.cache[key] = time
+        self.save_cache()
 
     def import_from_LocationManager(self, location_manager_dict: dict) -> None:
         self.locations = [DistanceMatrixLocation(location_id, location_data[0], location_data[1]) for
                           location_id, location_data in location_manager_dict.items()]
 
-    def build_distance_matrix_request(self):
-        request_ready_locations: [str] = [l.to_request_format() for l in self.locations]
-        origins_str: str = "|".join(request_ready_locations)
-        destinations_str: str = "|".join(request_ready_locations)
+    def build_distance_matrix_request(self, origin, destination):
+        origins_str: str = origin.to_request_format()
+        destinations_str: str = destination.to_request_format()
         url: str = f"{self.endpoint}origins={origins_str}&destinations={destinations_str}&key={self.API_KEY}"
         self.request_url = url
 
     def make_request(self):
         try:
             response = requests.get(self.request_url)
+            self.number_of_requests += 1
             if response.status_code == 200:
                 self.json_response = response.json()
             else:
-                print(f"[-] ERROR: fetching data issue, status code {response.status_code}")
-                return
+                print(f"[-] ERROR: fetching data issue; status code {response.status_code}")
+                return None
         except Exception as e:
             print(f"[-] ERROR: an error has occurred. {e}")
-            return
+            return None
 
     def parse_response(self):
+        try:
+            row = self.json_response['rows'][0]
+            element = row['elements'][0]
+            travel_time = element['duration']['value']
+            return travel_time
+        except (IndexError, KeyError):
+            print("[-] ERROR: Unable to parse response correctly.")
+            return None
 
-        origins = set()
-        destinations = set()
+    def get_travel_time_table(self) -> dict:
+        travel_times = {}
+        for origin, destination in itertools.combinations(self.locations, 2):
+            key = f"{origin.to_request_format()}_{destination.to_request_format()}"
+            reverse_key = f"{destination.to_request_format()}_{origin.to_request_format()}"
 
-        for row in self.json_response['rows']:
-            for element in row['elements']:
-                origins.add(element['origin'])
-                destinations.add(element['destination'])
-
-        lat_longs = origins.union(destinations)
-        print(lat_longs)
-
-        df_response = pd.DataFrame(index=list(lat_longs), columns=list(lat_longs)).fillna(
-            'N/A')
-
-        for i, row in enumerate(self.json_response['rows']):
-            origin_lat_long = row['elements'][0]['origin']
-            for j, element in enumerate(row['elements']):
-                destination_lat_long = element['destination']
-                df_response.at[origin_lat_long, destination_lat_long] = element['duration']['value']
-
-        return df_response
-
-    def get_travel_time_matrix(self) -> pd.DataFrame:
-        self.build_distance_matrix_request()
-        self.make_request()
-        return self.parse_response()
+            if key in self.cache:
+                print(f"[+] Using cached value for {key}")
+                travel_times[key] = self.cache[key]
+            elif reverse_key in self.cache:
+                print(f"[+] Using cached value for {reverse_key}")
+                travel_times[key] = self.cache[reverse_key]
+            else:
+                print(f"[*] Handling {origin} and {destination} location request")
+                self.build_distance_matrix_request(origin, destination)
+                self.make_request()
+                travel_time = self.parse_response()
+                self.add_to_cache(key, travel_time)
+                travel_times[key] = travel_time
+        return travel_times
 
 
 class LocationManager:
@@ -118,7 +139,6 @@ class LocationManager:
         """
         return {l: self.get_location(l) for l in locations}
 
-#
 # API_KEY = get_DistanceMatrix_credentials()
 # handler = DistanceMatrixInterface(API_KEY_=API_KEY)
 #
@@ -128,4 +148,4 @@ class LocationManager:
 # matchday_locations_dict = lm.return_matchday_location_subdictionary(matchday_locations)
 # handler.import_from_LocationManager(location_manager_dict=matchday_locations_dict)
 #
-# print(handler.get_travel_time_matrix())
+# print(handler.get_travel_time_table())

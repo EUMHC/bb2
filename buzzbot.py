@@ -41,21 +41,30 @@ class Fixture:
 teams = ["1s", "2s", "3s", "4s", "5s", "6s", "7s"]
 # matches = [Fixture(teams[i], teams[j]) for i in range(len(teams)) for j in range(i + 1, len(teams))]
 
+matches = []
+matches.append(Fixture('1s', 'Wildcats', datetime.datetime(2024, 2, 24, 13, 0, 0), 0, "Peffermill"))
+matches.append(
+    Fixture('2s', 'Clydesdale 2s', datetime.datetime(2024, 2, 24, 13, 30, 0), 1, "Titwood (Clydesdale Home)"))
+matches.append(Fixture('3s', 'Grange 3s', datetime.datetime(2024, 2, 24, 11, 30, 0), 1, "Peffermill"))
+matches.append(Fixture('4s', 'Uddingston 2s', datetime.datetime(2024, 2, 24, 13, 0, 0), 1, "Uddingston Hockey Club"))
+matches.append(Fixture('5s', 'Stirling Wanderers', datetime.datetime(2024, 2, 24, 12, 15, 0), 1, "Forthbank"))
+matches.append(Fixture('6s', 'Reivers', datetime.datetime(2024, 2, 24, 17, 30, 0), 1, "Peffermill"))
+matches.append(Fixture('7s', 'Peebles', datetime.datetime(2024, 2, 24, 11, 30, 0), 1, "Peffermill"))
 
 # Random fixtures, only home assignments, purely for testing purposes
-number_of_matches = 7
-matches = []
-playing_teams = random.sample(teams, number_of_matches)
-lm = LocationManager()
-for i in range(0, number_of_matches):
-    team1 = playing_teams[i]
-    random_opponent1 = ''.join(random.choices(string.ascii_uppercase + string.digits, k=3))  # Random opponent name
-    random_start_time, random_end_time = 11, 18  # 8AM & 8PM
-    start_hour = random.randint(random_start_time, random_end_time)
-    start_time = datetime.datetime.now().replace(hour=start_hour, minute=0, second=0, microsecond=0)
-    umpires_required = random.randint(0, 2)
-    location = random.choice(list(lm.get_all_location_names()))
-    matches.append(Fixture(team1, random_opponent1, start_time, umpires_required, location))
+# number_of_matches = 7
+# matches = []
+# playing_teams = random.sample(teams, number_of_matches)
+# lm = LocationManager()
+# for i in range(0, number_of_matches):
+#     team1 = playing_teams[i]
+#     random_opponent1 = ''.join(random.choices(string.ascii_uppercase + string.digits, k=3))  # Random opponent name
+#     random_start_time, random_end_time = 11, 18  # 8AM & 8PM
+#     start_hour = random.randint(random_start_time, random_end_time)
+#     start_time = datetime.datetime.now().replace(hour=start_hour, minute=0, second=0, microsecond=0)
+#     umpires_required = random.randint(0, 2)
+#     location = random.choice(list(lm.get_all_location_names()))
+#     matches.append(Fixture(team1, random_opponent1, start_time, umpires_required, location))
 
 umpiring_count = {team: 0 for team in teams}
 
@@ -68,7 +77,7 @@ class BuzzBot:
         self.location_manager = LocationManager()
         self.api = DistanceMatrixInterface(get_DistanceMatrix_credentials())
         self.bootstrap_api()
-        self.travel_time_matrix = self.api.get_travel_time_matrix()
+        self.travel_time_table = self.api.get_travel_time_table()
 
     def extract_location_names(self) -> [str]:
         return [m.location for m in self.matches]
@@ -84,7 +93,6 @@ class BuzzBot:
         matchday_locations = self.extract_location_names()
         matchday_locations_dict = self.location_manager.return_matchday_location_subdictionary(matchday_locations)
         self.api.import_from_LocationManager(matchday_locations_dict)
-
 
     def assign_covering_teams(self) -> None:
         """
@@ -141,17 +149,34 @@ class BuzzBot:
 
     def is_eligible(self, team: str, match: Fixture) -> bool:
         """
-
+        Checks eligibility of a team to umpire a given fixture
         :param team: Name as a string representing the team to check if eligible to umpire
         :param match: Fixture object representing the match to check eligibility against.
         :return: True if the team can cover umpiring, False if not
         """
+
+        """
+        The team cannot be playing in the match it is supposed to umpire. This is checked by ensuring that the 
+        team's name does not match either the home or away team involved in the match. If the team is playing in the 
+        match, it is deemed ineligible for umpiring."""
         if team in [match.home, match.away]:
             return False
+
+        """
+        The team cannot be playing in another match that overlaps with the given match. The method iterates 
+        through other matches to check if the team is playing in any of them. If the team is found to 
+        be playing in another match that overlaps in time with the given match, 
+        it cannot umpire the given match due to the time conflict."""
         for other_match in self.matches:
             if team in [other_match.home, other_match.away] and match.overlaps_with(other_match):
                 return False
 
+        """
+        The team must have enough travel time between the end of any match they are playing and the start of the 
+        match they are to umpire. For each match the team is playing that does not overlap with the given match, 
+        the method calculates the travel time from the location of that match to the location of the match to be 
+        umpired. If there isn't enough time for the team to travel between venues (the travel time is greater than 
+        the time difference between matches), the team is considered ineligible to umpire."""
         for other_match in self.matches:
             if team in [other_match.home, other_match.away]:
                 origin_cords = self.extract_location_coordinates([other_match.location])[0]
@@ -159,17 +184,38 @@ class BuzzBot:
                 travel_time = self.get_travel_time(origin_cords, dest_cords)
 
                 travel_time_delta = datetime.timedelta(minutes=travel_time)
-                time_diff = abs(match.start_time - other_match.end_time)
-                print(f"time diff {time_diff}, travel time delta {travel_time_delta}")
-                if time_diff < travel_time_delta:
+                time_diff_start = match.start_time - other_match.end_time
+                time_diff_end = other_match.start_time - match.end_time
+                buffer_time_one = int(time_diff_start.total_seconds() / 60) - int(
+                    travel_time_delta.total_seconds() / 60)
+                buffer_time_two = int(time_diff_end.total_seconds() / 60) - int(travel_time_delta.total_seconds() / 60)
+                print(
+                    f"UMPIRING TEAM: {team} PLAYING TEAM: {match.home}, TIMEDIFF_1 {time_diff_start}, TIMEDIFF_2 {time_diff_end} TRAVEL TIME {travel_time_delta}, BUFFER_TIME:[{buffer_time_one}, {buffer_time_two}]")
+
+                if buffer_time_one < 0 and buffer_time_two < 0:
                     return False
+
         return True
 
     def get_travel_time(self, origin, destination):
-        origin = ",".join([str(x) for x in origin])
-        destination = ",".join(str(x) for x in destination)
-        travel_time = self.travel_time_matrix.at[origin, destination]
-        return travel_time // 60  # converts to minutes
+        origin_str = ",".join([str(x) for x in origin])
+        destination_str = ",".join([str(x) for x in destination])
+
+        if origin_str == destination_str:  # Same location
+            return 0  # No travel time
+
+        key_forward = f"{origin_str}_{destination_str}"
+        key_reverse = f"{destination_str}_{origin_str}"
+
+        if key_forward in self.travel_time_table:
+            travel_time = self.travel_time_table[key_forward]
+        elif key_reverse in self.travel_time_table:
+            travel_time = self.travel_time_table[key_reverse]
+        else:
+            raise ValueError(
+                f"Travel time not found for the given origin `{origin_str}` and destination {destination_str}.")
+
+        return travel_time // 60
 
     def get_total_umpires_supplied(self):
         return sum(self.umpiring_count.values())
@@ -190,4 +236,4 @@ if __name__ == "__main__":
     print(f"TOTAL UMPIRES SUPPLIED: {buzzbot.get_total_umpires_supplied()}")
 
     warnings.warn("Always doublecheck and cross reference umpiring assignments given by The Buzzbot")
-    print(buzzbot.travel_time_matrix)
+    print(f"Total requests made for this computation: {buzzbot.api.number_of_requests}")
