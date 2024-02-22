@@ -89,40 +89,44 @@ class BuzzBot:
 
     def assign_covering_teams(self, print_results: bool) -> None:
         """
-        High level function called when all fixtures are to be assigned an umpire. Each `match` instance in the list
-        `matches`, the assigned umpire is updated.
-        :return: None
+        Assigns umpiring teams to matches, processed by individual match days.
         """
         matches_by_date = self.group_matches_by_date()
 
         for match_date, day_matches in matches_by_date.items():
             for match in day_matches:
-                if match.umpires_required == 0:
-                    match.covering_team = "COVERED"
-                    continue
-
-                selected_team = self.find_umpiring_team(match)
-                match.covering_team = selected_team
-                if selected_team != "No available umpire":
-                    # Initialize the count if it doesn't exist
-                    if selected_team not in self.umpiring_count:
-                        self.umpiring_count[selected_team] = 0
-                    self.umpiring_count[selected_team] += match.umpires_required
+                self.assign_team_to_match(match)
 
         if print_results:
-            print("\n")
-            print(("#" * 20) + " ASSIGNMENTS " + ("#" * 20))
-            utils.print_warning(
-                "DISCLAIMER: Always doublecheck and cross reference umpiring assignments given by The Buzzbot")
-            for match in self.matches:
-                print(
-                    f"{match.home} vs {match.away}, PB: {match.start_time}, END: {match.end_time} @ {match.location} - Umpiring "
-                    f"Team: {match.covering_team} providing {match.umpires_required} umpire(s)\n\tAll eligible teams: {match.eligible_teams}\n")
-            utils.print_warning(
-                "DISCLAIMER: Always doublecheck and cross reference umpiring assignments given by The Buzzbot")
-            print("#" * 53)
-            print("\n")
-            print(f"TOTAL UMPIRES SUPPLIED: {self.get_total_umpires_supplied()}")
+            self.print_results()
+
+    def assign_team_to_match(self, match):
+        """
+        Assigns a covering team to a single match.
+        """
+        if match.umpires_required == 0:
+            match.covering_team = "COVERED"
+            return
+
+        selected_team = self.find_umpiring_team(match)
+        match.covering_team = selected_team
+        if selected_team != "No available umpire":
+            self.umpiring_count[selected_team] = self.umpiring_count.get(selected_team, 0) + match.umpires_required
+
+    def print_results(self) -> None:
+        print("\n")
+        print(("#" * 20) + " ASSIGNMENTS " + ("#" * 20))
+        utils.print_warning(
+            "DISCLAIMER: Always doublecheck and cross reference umpiring assignments given by The Buzzbot")
+        for match in self.matches:
+            print(
+                f"{match.home} vs {match.away}, PB: {match.start_time}, END: {match.end_time} @ {match.location} - Umpiring "
+                f"Team: {match.covering_team} providing {match.umpires_required} umpire(s)\n\tAll eligible teams: {match.eligible_teams}\n")
+        utils.print_warning(
+            "DISCLAIMER: Always doublecheck and cross reference umpiring assignments given by The Buzzbot")
+        print("#" * 53)
+        print("\n")
+        print(f"TOTAL UMPIRES SUPPLIED: {self.get_total_umpires_supplied()}")
 
     def find_umpiring_team(self, match: Fixture) -> str:
         """
