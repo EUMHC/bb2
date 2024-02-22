@@ -4,6 +4,18 @@
 
 `If the EUHC Cinematic Universe allowed myself, Jack Mead, and Ed Bury to do the umpiring assignments for EUMHC together at the same time. Then times that by 10 million. That is The BuzzBot`
 
+## Abstract
+
+Students don't like umpiring. In an ideal world, every player at a university hockey club would never have to umpire
+a game during their time at the club. Alas, this is not the case. At Edinburgh University Men's Hockey Club, the club
+policy
+is that all umpires are players; the two are not mutually exclusive like they are at other clubs. When priority is given
+to ensure all players are able to put playing first, a system for assigning umpires to fixtures can be modelled. Given a
+uniform spread of umpires across all playing teams, assignments can be given to a team rather than an individual. The
+system
+presented, called The BuzzBot, successfully assigns 'covering teams' to fixtures based on set assumptions and
+constraints.
+
 ## Constraints, Heuristics, and Assumptions
 
 - The higher the team, the better the umpiring ability. (1s > 2s > 3s > ...)
