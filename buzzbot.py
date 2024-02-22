@@ -7,6 +7,9 @@ import warnings
 import utils
 import logging
 
+from itertools import groupby
+from operator import attrgetter
+
 from DistanceMatrixAPI import DistanceMatrixInterface, LocationManager
 from credentials import get_DistanceMatrix_credentials
 
@@ -62,6 +65,7 @@ class BuzzBot:
         self.api: DistanceMatrixInterface = DistanceMatrixInterface(get_DistanceMatrix_credentials())
         self.bootstrap_api()
         self.travel_time_table: dict = self.api.get_travel_time_table()
+        self.assignments: dict = {}
 
     def extract_location_names(self) -> [str]:
         return [m.location for m in self.matches]
@@ -78,21 +82,32 @@ class BuzzBot:
         matchday_locations_dict = self.location_manager.return_matchday_location_subdictionary(matchday_locations)
         self.api.import_from_LocationManager(matchday_locations_dict)
 
+    def group_matches_by_date(self):
+        self.matches.sort(key=lambda x: x.start_time.date())
+        grouped_matches = groupby(self.matches, key=lambda x: x.start_time.date())
+        return {date: list(matches) for date, matches in grouped_matches}
+
     def assign_covering_teams(self, print_results: bool) -> None:
         """
         High level function called when all fixtures are to be assigned an umpire. Each `match` instance in the list
         `matches`, the assigned umpire is updated.
         :return: None
         """
-        for match in self.matches:
-            if match.umpires_required == 0:
-                match.covering_team = "COVERED"
-                continue
+        matches_by_date = self.group_matches_by_date()
 
-            selected_team = self.find_umpiring_team(match)
-            match.covering_team = selected_team
-            if selected_team != "No available umpire":
-                self.umpiring_count[selected_team] += match.umpires_required
+        for match_date, day_matches in matches_by_date.items():
+            for match in day_matches:
+                if match.umpires_required == 0:
+                    match.covering_team = "COVERED"
+                    continue
+
+                selected_team = self.find_umpiring_team(match)
+                match.covering_team = selected_team
+                if selected_team != "No available umpire":
+                    # Initialize the count if it doesn't exist
+                    if selected_team not in self.umpiring_count:
+                        self.umpiring_count[selected_team] = 0
+                    self.umpiring_count[selected_team] += match.umpires_required
 
         if print_results:
             print("\n")
@@ -179,20 +194,17 @@ class BuzzBot:
         umpired. If there isn't enough time for the team to travel between venues (the travel time is greater than 
         the time difference between matches), the team is considered ineligible to umpire."""
         for other_match in self.matches:
-            # Check if the team is playing in this other match
             if team in [other_match.home, other_match.away]:
                 # Extract coordinates for both matches
                 origin_coords = self.extract_location_coordinates([other_match.location])[0]
                 destination_coords = self.extract_location_coordinates([match.location])[0]
 
-                # Calculate travel time between locations
                 travel_time_minutes = self.get_travel_time(origin_coords, destination_coords)
 
                 # Calculate the time difference between the matches in both directions
                 buffer_after = (match.start_time - other_match.end_time).total_seconds() / 60 - travel_time_minutes
                 buffer_before = (other_match.start_time - match.end_time).total_seconds() / 60 - travel_time_minutes
 
-                # If the team doesn't have enough buffer time in either direction, they can't umpire
                 if buffer_after < 0 and buffer_before < 0:
                     return False
 
@@ -222,18 +234,6 @@ class BuzzBot:
         return sum(self.umpiring_count.values())
 
 
-if __name__ == "__main__":
-    utils.print_ascii_header()
-    # print(f"TheBuzzBot says, \"{utils.get_opening_tagline()}\"\n")
-    utils.get_opening_tagline_with_cowsay()
-
-    teams = ["1s", "2s", "3s", "4s", "5s", "6s", "7s"]
-    matches = load_fixtures_from_csv("input.csv")
-    umpiring_count = {team: 0 for team in teams}
-
-    # Usage
-    buzzbot = BuzzBot(matches, teams, umpiring_count)
-    buzzbot.assign_covering_teams(print_results=True)
-
-    print(
-        f"Total requests made for this computation: {buzzbot.api.number_of_requests}.\n\tThe closer to 0, the better.")
+utils.print_ascii_header()
+print(f"TheBuzzBot says, \"{utils.get_opening_tagline()}\"\n")
+# utils.get_opening_tagline_with_cowsay()

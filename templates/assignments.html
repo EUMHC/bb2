@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The BuzzBot</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f0f0f0;
+        }
+
+        .date-header {
+            margin-top: 20px;
+        }
+
+        .buzzbot-quote {
+            background: #f0f0f0; /* Example background color */
+            color: #333; /* Text color */
+            padding: 10px;
+            margin-bottom: 20px; /* Space before the next content section */
+        }
+
+        .pale-green {
+            background-color: #ccffcc;
+        }
+
+        /* Pale green background */
+        .pale-red {
+            background-color: #ffcccc;
+        }
+
+        /* Pale red background */
+
+        .color-key {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+        }
+
+        .key-square {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+        }
+
+
+        .disclaimer-banner {
+            background-color: #ffffcc; /* Light yellow background for visibility */
+            color: #333; /* Dark text for contrast */
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #ccc; /* subtle separation from the rest of the page */
+            font-size: 14px; /* Adjust based on preference */
+        }
+
+    </style>
+</head>
+<body>
+<h1>EUMHC BuzzBot Umpiring Assignments</h1>
+
+<!--    <div class="buzzbot-quote">-->
+<!--        BuzzBot says, "{{ tagline_text }}"-->
+<!--    </div>-->
+
+<div class="color-key">
+    <div class="key-square pale-green"></div>
+    <span>Home</span>
+    <div class="key-square pale-red"></div>
+    <span>Away</span>
+</div>
+
+{% for date, games in games_by_date.items() %}
+<div class="date-header"><h2>Assignments for {{ date.strftime('%A, %d %B, %Y') }}</h2></div>
+
+<div class="disclaimer-banner">
+    DISCLAIMER: Always doublecheck and cross-reference umpiring assignments given by The BuzzBot
+</div>
+
+<table>
+    <thead>
+    <tr>
+        <th>Uni Team</th>
+        <th>Opposition</th>
+        <th>Location</th>
+        <th>Pushback</th>
+        <th>End Time</th>
+        <th>Umpiring Team</th>
+        <th>Umpires Needed</th>
+        <th>Eligible Teams</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for game in games %}
+    <tr class="{{ 'pale-green' if game.location == 'Peffermill' else 'pale-red' }}">
+        <td>{{ game.home }}</td>
+        <td>{{ game.away }}</td>
+        <td>{{ game.location }}</td>
+        <!--                        <td>{{ game.start_time.strftime('%Y-%m-%d %H:%M') }}</td>-->
+        <!--                        <td>{{ game.end_time.strftime('%Y-%m-%d %H:%M') }}</td>-->
+        <td>{{ game.start_time.strftime('%H:%M') }}</td>
+        <td>{{ game.end_time.strftime('%H:%M') }}</td>
+        <td>{{ game.covering_team }}</td>
+        <td>{{ game.umpires_required }}</td>
+        <td>{{ game.eligible_teams|join(', ') }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<hr>
+{% else %}
+<p>No games scheduled.</p>
+{% endfor %}
+
+</body>
+</html>
+

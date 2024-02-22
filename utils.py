@@ -24,7 +24,7 @@ for EUMHC together at the same time. Then times that by 10 million.`
 def get_opening_tagline():
     taglines = [
         "Ted Porter should do a pint",
-        "On a warm summers evening, on a train bound for nowhere, I met up with Gambler",
+        "On a warm summers evening, on a train bound for nowhere, I met up with the Gambler",
         "Jack Mead was the Greatest Vice President of All Time",
         "Joe Hutcheson stole your keys last social",
         "Trimble had a dream, to build a hockey team,\nHe didn't have a stick or even a ball,\nHe build from the back "
@@ -33,7 +33,7 @@ def get_opening_tagline():
         "Stand up if you hate the 2s",
         "The 2s are in their beds",
         "See it off fresher!",
-        "CG chased Tash all the way to Florence!"
+        "Ritchie can't swim"
     ]
     return random.choice(taglines)
 
