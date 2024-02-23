@@ -21,16 +21,24 @@ logger.addHandler(fh)
 
 def load_fixtures_from_csv(csv_path):
     matches_ = []
-    with open(csv_path, newline='') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            home = row['home']
-            away = row['away']
-            start_time = datetime.datetime.strptime(row['start_time'], '%Y-%m-%d %H:%M:%S')
-            umpires_needed = int(row['umpires_needed'])
-            location = row['location']
-            matches_.append(Fixture(home, away, start_time, umpires_needed, location))
-    return matches_
+    file_ok, message = utils.validate_csv_format(csv_path)
+    if not file_ok:
+        raise Exception(f"{message}")
+
+    try:
+        with open(csv_path, newline='') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                home = row['uni_team'].strip()
+                away = row['opposition'].strip()
+                start_time = datetime.datetime.strptime(row['start_time'].strip(), '%Y-%m-%d %H:%M:%S')
+                umpires_needed = int(row['umpires_needed'].strip())
+                location = row['location'].strip()
+                matches_.append(Fixture(home, away, start_time, umpires_needed, location))
+        return matches_
+    except Exception as e:
+        raise Exception(f"You have been an idiot somewhere with the input.csv file. Read the following message to "
+                        f"gauge what the issue is : '{str(e)}'")
 
 
 class Fixture:
@@ -66,19 +74,31 @@ class BuzzBot:
     def extract_location_names(self) -> [str]:
         return [m.location for m in self.matches]
 
-    def extract_location_coordinates(self, location_names_) -> [(float, float)]:
+    def extract_location_coordinates(self, location_names_: [str]) -> [(float, float)]:
+        """
+        Returns a list of coordinates from a list of given location names
+        :param location_names_: List of strings representing location names
+        :return: List of tuples of floats representing the lat long pairs for each location
+        """
         coords = []
         for name in location_names_:
             coord = self.location_manager.get_location(name)
             coords.append(coord)
         return coords
 
-    def bootstrap_api(self):
+    def bootstrap_api(self) -> None:
+        """
+        Initialising the Distance Matrix API with the match day locations
+        """
         matchday_locations = self.extract_location_names()
         matchday_locations_dict = self.location_manager.return_matchday_location_subdictionary(matchday_locations)
         self.api.import_from_LocationManager(matchday_locations_dict)
 
-    def group_matches_by_date(self):
+    def group_matches_by_date(self) -> dict:
+        """
+        Groups the matches by date
+        :return: a dictionary where key is the date, and the values are list of Fixture objects
+        """
         self.matches.sort(key=lambda x: x.start_time.date())
         grouped_matches = groupby(self.matches, key=lambda x: x.start_time.date())
         return {date: list(matches) for date, matches in grouped_matches}
@@ -86,6 +106,7 @@ class BuzzBot:
     def assign_covering_teams(self, print_results: bool) -> None:
         """
         Assigns umpiring teams to matches, processed by individual match days.
+        :param print_results: If true, prints the results
         """
         if len(self.matches) == 0:
             return
@@ -98,9 +119,10 @@ class BuzzBot:
         if print_results:
             self.print_results()
 
-    def assign_team_to_match_single_matchday(self, match):
+    def assign_team_to_match_single_matchday(self, match: Fixture) -> None:
         """
-        Assigns a covering team to a single match.
+        Assigns a covering team to a single match, using only the matches on that match day.
+        :param match: Fixture object
         """
         if match.umpires_required == 0:
             match.covering_team = "COVERED"
@@ -112,6 +134,10 @@ class BuzzBot:
             self.umpiring_count[selected_team] = self.umpiring_count.get(selected_team, 0) + match.umpires_required
 
     def print_results(self) -> None:
+        """
+        Prints the results of the umpiring assignments
+        :return: None
+        """
         print("\n")
         print(("#" * 20) + " ASSIGNMENTS " + ("#" * 20))
         utils.print_warning(
@@ -167,7 +193,12 @@ class BuzzBot:
 
     def is_eligible(self, team: str, match: Fixture) -> bool:
         """
-        Checks eligibility of a team to umpire a given fixture - the important function.
+        Checks eligibility of a team to umpire a given fixture - the important function. Functions based on the three
+        following conditions:
+        - A team can't umpire a game it's playing in.
+        - A team can't umpire a game that overlaps with it's own game.
+        - A team can only umpire a game if there is enough travel time between it's own game and the umpiring game.
+
         :param team: Name as a string representing the team to check if eligible to umpire
         :param match: Fixture object representing the match to check eligibility against.
         :return: True if the team can cover umpiring, False if not
@@ -213,7 +244,7 @@ class BuzzBot:
 
         return True
 
-    def get_travel_time(self, origin, destination):
+    def get_travel_time(self, origin: tuple, destination: tuple) -> int:
         origin_str = ",".join([str(x) for x in origin])
         destination_str = ",".join([str(x) for x in destination])
 

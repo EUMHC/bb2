@@ -1,0 +1,127 @@
+/*@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');*/
+@import url('https://fonts.googleapis.com/css2?family=Kode+Mono:wght@400..700&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+
+body {
+    font-family: 'Lato'; /* This sets the font for all text unless overridden */
+    line-height: 1.6;
+    overflow-x: hidden; /* Moved from html to body for consistency */
+    padding-left: 250px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+th, td {
+    border: 1px solid black;
+    padding: 8px;
+}
+
+th {
+    background-color: #f0f0f0;
+}
+
+.date-header {
+    margin-top: 20px;
+}
+
+.pale-green {
+    background-color: #ccffcc;
+}
+
+/* Pale green background */
+.pale-red {
+    background-color: #ffcccc;
+}
+
+/* Pale red background */
+
+.color-key {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+}
+
+.key-square {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+}
+
+.disclaimer-banner {
+    background-color: #ffffcc; /* Light yellow background for visibility */
+    color: #333; /* Dark text for contrast */
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #ccc; /* subtle separation from the rest of the page */
+    font-size: 14px; /* Adjust based on preference */
+}
+
+.bar {
+    position: relative;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    padding: 10px 0;
+
+    background-color: #add8e6; /* Pastel blue */
+    color: black;
+
+    font-family: Kode-Mono;
+    font-size: 18px;
+}
+
+.bar_content {
+    display: block; /* Important to give the content a width */
+
+    width: 100%;
+    transform: translateX(100%); /* Animation start out of the screen */
+
+    /* Add the animation */
+    animation: move 30s linear infinite /* infinite make reapeat the animation indefinitely */;
+}
+
+/* Create the animation */
+@keyframes move {
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+.sidebar {
+    position: fixed; /* Or `absolute` if you prefer */
+    left: 0;
+    top: 0;
+    width: 200px; /* Adjust width as needed */
+    height: 100%;
+    overflow-y: auto; /* Enable scrolling if the content is too long */
+    background-color: #f0f0f0; /* Light grey background */
+    padding: 20px;
+}
+
+
+#timeline-container {
+    width: 100%;
+    overflow-x: scroll;
+    white-space: nowrap;
+}
+
+#timeline {
+    position: relative;
+    height: 100px;
+    background-color: #f0f0f0;
+}
+
+.event {
+    position: absolute;
+    height: 80%;
+    bottom: 10%;
+    background-color: lightblue;
+    border-radius: 5px;
+    padding: 5px;
+}
+

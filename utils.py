@@ -1,7 +1,11 @@
+import csv
+import datetime
 import math
 import random
 import subprocess
 from datetime import timedelta
+
+import buzzbot_constants
 
 
 def print_ascii_header():
@@ -58,6 +62,44 @@ def print_warning(message):
   {'*' * (len(message) + 4)}
   '''
     print(warning)
+
+
+def validate_csv_format(file_path):
+    teams = buzzbot_constants.get_uni_teams()
+    expected_headers = ['uni_team', 'opposition', 'start_time', 'umpires_needed', 'location']  # Example headers
+    expected_num_columns = len(expected_headers)
+    with open(file_path, mode='r', encoding='utf-8') as csvfile:
+        reader = csv.reader(csvfile)
+
+        # Check headers
+        headers = next(reader)
+        if headers != expected_headers:
+            return False, "Header mismatch"
+
+        # Check each row
+        for row_number, row in enumerate(reader, start=2):  # Starting from 2 because header is row 1
+            if len(row) != expected_num_columns:
+                return False, f"Row {row_number} has incorrect number of columns"
+
+            if row[0] not in teams:
+                return False, (f"Row {row_number} which is meant to represent the uni team is not an actual uni team "
+                               f"({row[0]}). It should be 1s, 2s, 3s, 4s, 5s, 6s, or 7s")
+
+            try:
+                datetime.datetime.strptime(row[2], '%Y-%m-%d %H:%M:%S')
+            except Exception as e:
+                return False, (f"Row {row_number} start_time value is not of the correct format. It is {row[2]} and it "
+                               f"should be of the format 'YYYY-MM-DD HH:MM:SS'")
+
+            if not row[3].isdigit():
+                return False, (f"Row {row_number} has a non-numeric value for number of umpires "
+                               f"required. Current value {row[3]}")
+
+            if int(row[3]) < 0 or int(row[3]) > 2:
+                return False, (f"Row {row_number} has an invalid number of umpires. It should either be 0, 1, or 2. It "
+                               f"is currently {row[3]}")
+
+    return True, "CSV format is correct"
 
 
 def calculate_confidence(I: timedelta, T: timedelta) -> float:

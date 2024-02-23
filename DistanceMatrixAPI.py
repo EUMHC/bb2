@@ -69,10 +69,12 @@ class DistanceMatrixInterface:
             if response.status_code == 200:
                 self.json_response = response.json()
             else:
-                print(f"[-] ERROR: fetching data issue; status code {response.status_code}")
+                print(
+                    f"[-] ERROR: fetching data issue when an API request has been made; status code {response.status_code}")
                 return None
         except Exception as e:
-            print(f"[-] ERROR: an error has occurred. {e}")
+            print(
+                f"[-] ERROR: an error when making a request to {self.request_url} has occurred. The following exception message has been thrown: {e}")
             return None
 
     def parse_response(self):
