@@ -79,25 +79,26 @@ def validate_csv_format(file_path):
         # Check each row
         for row_number, row in enumerate(reader, start=2):  # Starting from 2 because header is row 1
             if len(row) != expected_num_columns:
-                return False, f"Row {row_number} has incorrect number of columns"
+                return False, f"Row {row_number} {row} has incorrect number of columns"
 
             if row[0] not in teams:
-                return False, (f"Row {row_number} which is meant to represent the uni team is not an actual uni team "
-                               f"({row[0]}). It should be 1s, 2s, 3s, 4s, 5s, 6s, or 7s")
+                return False, (f"Row {row_number} {row} which is meant to represent the uni team is not an actual "
+                               f"uni team ({row[0]}). It should be 1s, 2s, 3s, 4s, 5s, 6s, or 7s")
 
             try:
                 datetime.datetime.strptime(row[2], '%Y-%m-%d %H:%M:%S')
             except Exception as e:
-                return False, (f"Row {row_number} start_time value is not of the correct format. It is {row[2]} and it "
+                return False, (
+                    f"Row {row_number} {row} start_time value is not of the correct format. It is {row[2]} and it "
                                f"should be of the format 'YYYY-MM-DD HH:MM:SS'")
 
-            if not row[3].isdigit():
-                return False, (f"Row {row_number} has a non-numeric value for number of umpires "
-                               f"required. Current value {row[3]}")
+            # if not int(row[3]).isdigit():
+            #     return False, (f"Row {row_number} has a non-numeric value for number of umpires "
+            #                    f"required. Current value {row[3]}")
 
             if int(row[3]) < 0 or int(row[3]) > 2:
-                return False, (f"Row {row_number} has an invalid number of umpires. It should either be 0, 1, or 2. It "
-                               f"is currently {row[3]}")
+                return False, (f"Row {row_number} {row} has an invalid number of umpires. It should either be 0, 1, "
+                               f"or 2. It is currently {row[3]}")
 
     return True, "CSV format is correct"
 

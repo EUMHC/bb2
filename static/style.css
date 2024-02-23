@@ -125,3 +125,19 @@ th {
     padding: 5px;
 }
 
+.error-message {
+    background-color: #ffdddd; /* Light red background */
+    border-left: 6px solid #f44336; /* Darker red border on the left for emphasis */
+    margin: 20px 0; /* Add some margin for spacing */
+    padding: 10px 20px; /* Padding for spacing inside the div */
+    color: #d8000c; /* Dark red text color for better readability */
+    font-size: 16px; /* Slightly larger font size for clarity */
+    border-radius: 5px; /* Optional: Rounds the corners of the border */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Adds a subtle shadow to make the error message "pop" */
+}
+
+.error-message p {
+    margin: 0; /* Removes default margin from the paragraph to control spacing more precisely */
+    padding: 0; /* Removes default padding for similar reasons */
+}
+
