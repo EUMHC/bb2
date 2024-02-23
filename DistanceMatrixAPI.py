@@ -1,6 +1,7 @@
 import os
 import csv
 import itertools
+from tqdm import tqdm
 
 import requests
 import json
@@ -48,6 +49,9 @@ class DistanceMatrixInterface:
         self.cache[key] = time
         self.save_cache()
 
+    def get_cache_size(self) -> int:
+        return len(self.cache)
+
     def import_from_LocationManager(self, location_manager_dict: dict) -> None:
         self.locations = [DistanceMatrixLocation(location_id, location_data[0], location_data[1]) for
                           location_id, location_data in location_manager_dict.items()]
@@ -84,7 +88,7 @@ class DistanceMatrixInterface:
     def get_travel_time_table(self) -> dict:
         print(("~" * 20) + " Initialising travel time table " + ("~" * 20))
         travel_times = {}
-        for origin, destination in itertools.combinations(self.locations, 2):
+        for origin, destination in tqdm(itertools.combinations(self.locations, 2)):
             key = f"{origin.to_request_format()}_{destination.to_request_format()}"
             reverse_key = f"{destination.to_request_format()}_{origin.to_request_format()}"
 

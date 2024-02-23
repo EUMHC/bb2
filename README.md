@@ -2,7 +2,7 @@
 
 [![wakatime](https://wakatime.com/badge/user/eb310a2d-fc37-4859-8755-b6b88930af57/project/018cdb8d-3c59-4706-8b4c-4fb2808b90c9.svg)](https://wakatime.com/badge/user/eb310a2d-fc37-4859-8755-b6b88930af57/project/018cdb8d-3c59-4706-8b4c-4fb2808b90c9)
 
-`If the EUHC Cinematic Universe allowed myself, Jack Mead, and Ed Bury to do the umpiring assignments for EUMHC together at the same time. Then times that by 10 million. That is The BuzzBot`
+`If the EUHC Cinematic Universe allowed Jack Mead, Ed Bury, and I to do the umpiring assignments for EUMHC together at the same time. Then times that by 10 million. That is The BuzzBot`
 
 ## Abstract
 

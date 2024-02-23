@@ -19,7 +19,7 @@ def home():
     games = bot.matches
     games.sort(key=lambda x: x.start_time)
     games_by_date = {date: list(games) for date, games in groupby(games, key=lambda x: x.start_time.date())}
-    return render_template('assignments.html', games_by_date=games_by_date, tagline_text=utils.get_opening_tagline())
+    return render_template('assignments.html', games_by_date=games_by_date, taglines=utils.taglines)
 
 
 if __name__ == '__main__':

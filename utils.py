@@ -21,20 +21,26 @@ for EUMHC together at the same time. Then times that by 10 million.`
     print(ascii_art)
 
 
+taglines = [
+    "Ted Porter should do a pint",
+    "On a warm summers evening, on a train bound for nowhere, I met up with the Gambler",
+    "Jack Mead was the Greatest Vice President of All Time",
+    "Joe Hutcheson stole your keys last social",
+    "Trimble had a dream, to build a hockey team,\nHe didn't have a stick or even a ball,\nHe built from the back "
+    "with Sam in attack,\nThey are the 6s, they're on their way back!\nDu Du Du",
+    "Stand up if you hate the 1s",
+    "Stand up if you hate the 2s",
+    "The 2s are in their beds",
+    "See it off fresher!",
+    "Ritchie can't swim",
+    "@Jack Jamieson",
+    "Have you tried calling it?",
+    "7s on fire, your defence is terrified",
+    "I fucking love Bag Carrier. Or is it Carrier Bag?"
+]
+
+
 def get_opening_tagline():
-    taglines = [
-        "Ted Porter should do a pint",
-        "On a warm summers evening, on a train bound for nowhere, I met up with the Gambler",
-        "Jack Mead was the Greatest Vice President of All Time",
-        "Joe Hutcheson stole your keys last social",
-        "Trimble had a dream, to build a hockey team,\nHe didn't have a stick or even a ball,\nHe build from the back "
-        "with Sam in attack,\nThey are the 6s, they're on their way back!\nDu Du Du",
-        "Stand up if you hate the 1s",
-        "Stand up if you hate the 2s",
-        "The 2s are in their beds",
-        "See it off fresher!",
-        "Ritchie can't swim"
-    ]
     return random.choice(taglines)
 
 

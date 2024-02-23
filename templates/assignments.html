@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The BuzzBot</title>
     <style>
+
+        /*@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');*/
+        @import url('https://fonts.googleapis.com/css2?family=Kode+Mono:wght@400..700&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+
+        body {
+            font-family: 'Lato'; /* This sets the font for all text unless overridden */
+            line-height: 1.6;
+            overflow-x: hidden; /* Moved from html to body for consistency */
+            padding-left: 250px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -22,13 +33,6 @@
 
         .date-header {
             margin-top: 20px;
-        }
-
-        .buzzbot-quote {
-            background: #f0f0f0; /* Example background color */
-            color: #333; /* Text color */
-            padding: 10px;
-            margin-bottom: 20px; /* Space before the next content section */
         }
 
         .pale-green {
@@ -55,7 +59,6 @@
             display: inline-block;
         }
 
-
         .disclaimer-banner {
             background-color: #ffffcc; /* Light yellow background for visibility */
             color: #333; /* Dark text for contrast */
@@ -65,14 +68,84 @@
             font-size: 14px; /* Adjust based on preference */
         }
 
+        .bar {
+            position: relative;
+            top: 0;
+            left: 0;
+
+            width: 100%;
+            padding: 25px 0;
+
+            background-color: #add8e6; /* Pastel blue */
+            color: black;
+
+            font-family: Kode-Mono;
+            font-size: 18px;
+        }
+
+        .bar_content {
+            display: block; /* Important to give the content a width */
+
+            width: 100%;
+            transform: translateX(100%); /* Animation start out of the screen */
+
+            /* Add the animation */
+            animation: move 30s linear infinite /* infinite make reapeat the animation indefinitely */;
+        }
+
+        /* Create the animation */
+        @keyframes move {
+            to {
+                transform: translateX(-100%);
+            }
+        }
+
+        .sidebar {
+            position: fixed; /* Or `absolute` if you prefer */
+            left: 0;
+            top: 0;
+            width: 200px; /* Adjust width as needed */
+            height: 100%;
+            overflow-y: auto; /* Enable scrolling if the content is too long */
+            background-color: #f0f0f0; /* Light grey background */
+            padding: 20px;
+        }
+
+
     </style>
 </head>
 <body>
+
 <h1>EUMHC BuzzBot Umpiring Assignments</h1>
 
-<!--    <div class="buzzbot-quote">-->
-<!--        BuzzBot says, "{{ tagline_text }}"-->
-<!--    </div>-->
+A program by Callum Alexander<br>
+
+<em>"If the EUHC Cinematic Universe allowed Jack Mead, Ed Bury, and I to do the umpiring assignments for EUMHC together
+    at the same time. Then times that by 10 million. That is The BuzzBot"</em>
+
+<div class="bar">
+        <span class="bar_content" id="tagline">
+            BuzzBot says, "{{ taglines[0] }}"
+        </span>
+</div>
+
+
+<div class="sidebar">
+
+    <h4>Quick Navigation</h4>
+
+    {% for date, games in games_by_date.items() %}
+    <a href="#{{ date.strftime('%Y-%m-%d') }}">
+        {{ date.strftime('%A, %d %B, %Y') }}
+    </a>
+    <br>
+    {% endfor %}
+</div>
+
+{% for date, games in games_by_date.items() %}
+<div class="date-header" id="{{ date.strftime('%Y-%m-%d') }}">
+    <h2>Assignments for {{ date.strftime('%A, %d %B, %Y') }}</h2>
+</div>
 
 <div class="color-key">
     <div class="key-square pale-green"></div>
@@ -80,9 +153,6 @@
     <div class="key-square pale-red"></div>
     <span>Away</span>
 </div>
-
-{% for date, games in games_by_date.items() %}
-<div class="date-header"><h2>Assignments for {{ date.strftime('%A, %d %B, %Y') }}</h2></div>
 
 <div class="disclaimer-banner">
     DISCLAIMER: Always doublecheck and cross-reference umpiring assignments given by The BuzzBot
@@ -111,7 +181,7 @@
         <!--                        <td>{{ game.end_time.strftime('%Y-%m-%d %H:%M') }}</td>-->
         <td>{{ game.start_time.strftime('%H:%M') }}</td>
         <td>{{ game.end_time.strftime('%H:%M') }}</td>
-        <td>{{ game.covering_team }}</td>
+        <td><b>{{ game.covering_team }}</b></td>
         <td>{{ game.umpires_required }}</td>
         <td>{{ game.eligible_teams|join(', ') }}</td>
     </tr>
@@ -120,8 +190,30 @@
 </table>
 <hr>
 {% else %}
-<p>No games scheduled.</p>
+<h2>No games scheduled.</h2>
 {% endfor %}
+
+
+<script>
+    // Convert your taglines array to JavaScript
+    const taglines = {
+    {
+        taglines | tojson
+    }
+    }
+    ;
+
+    // Function to change the tagline
+    function changeTagline() {
+        const taglineElement = document.getElementById('tagline');
+        const randomTagline = `BuzzBot says, "${taglines[Math.floor(Math.random() * taglines.length)]}"`;
+        taglineElement.innerHTML = randomTagline;
+    }
+
+    // Listen for the end of the animation
+    const barContent = document.querySelector('.bar_content');
+    barContent.addEventListener('animationiteration', changeTagline);
+</script>
 
 </body>
 </html>

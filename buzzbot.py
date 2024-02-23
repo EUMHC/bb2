@@ -1,9 +1,5 @@
 import csv
 import datetime
-import random
-import string
-import numpy as np
-import warnings
 import utils
 import logging
 
@@ -91,16 +87,18 @@ class BuzzBot:
         """
         Assigns umpiring teams to matches, processed by individual match days.
         """
+        if len(self.matches) == 0:
+            return
         matches_by_date = self.group_matches_by_date()
 
         for match_date, day_matches in matches_by_date.items():
             for match in day_matches:
-                self.assign_team_to_match(match)
+                self.assign_team_to_match_single_matchday(match)
 
         if print_results:
             self.print_results()
 
-    def assign_team_to_match(self, match):
+    def assign_team_to_match_single_matchday(self, match):
         """
         Assigns a covering team to a single match.
         """
@@ -120,7 +118,8 @@ class BuzzBot:
             "DISCLAIMER: Always doublecheck and cross reference umpiring assignments given by The Buzzbot")
         for match in self.matches:
             print(
-                f"{match.home} vs {match.away}, PB: {match.start_time}, END: {match.end_time} @ {match.location} - Umpiring "
+                f"{match.home} vs {match.away}, PB: {match.start_time}, END: {match.end_time} @ {match.location} - "
+                f"Umpiring"
                 f"Team: {match.covering_team} providing {match.umpires_required} umpire(s)\n\tAll eligible teams: {match.eligible_teams}\n")
         utils.print_warning(
             "DISCLAIMER: Always doublecheck and cross reference umpiring assignments given by The Buzzbot")
