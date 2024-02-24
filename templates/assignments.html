@@ -6,37 +6,43 @@
     <link rel="stylesheet" type="text/css" href="static/style.css">
     <title>The BuzzBot</title>
 </head>
+
 <body>
 
-<div id="top">
-    <h1>EUMHC BuzzBot Umpiring Assignments</h1>
-</div>
-A program by Callum Alexander<br>
-
-<em>"If the EUHC Cinematic Universe allowed Jack Mead, Ed Bury, and I to do the umpiring assignments for EUMHC together
-    at the same time. Then times that by 10 million. That is The BuzzBot"</em>
-
 <div class="bar">
-            <span class="bar_content" id="tagline">
-                BuzzBot says, "{{ taglines[0] }}"
-            </span>
+        <span class="bar_content" id="tagline">
+            BuzzBot says, "<i>{{ taglines[0] }}</i>"
+        </span>
 </div>
 
+<div class="content">
 
-<div class="sidebar">
+    <div id="top">
+        <h1>EUMHC BuzzBot Umpiring Assignments</h1>
+    </div>
+    A program by Callum Alexander<br>
 
-    <h4>Quick Navigation</h4>
+    <em>"If the EUHC Cinematic Universe allowed Jack Mead, Ed Bury, and I to do the umpiring assignments for EUMHC
+        together
+        at the same time. Then times that by 10 million. That is The BuzzBot"</em>
 
-    <a href="#top">Back to the top</a>
-    <br><br>
 
-    {% for date, games in games_by_date.items() %}
-    <a href="#{{ date.strftime('%Y-%m-%d') }}">
-        {{ date.strftime('%A, %d %B, %Y') }}
-    </a>
-    <br>
-    {% endfor %}
-</div>
+    <div class="sidebar">
+
+        <h3>The BuzzBot</h3>
+
+        <h4>Quick Navigation</h4>
+
+        <a href="#top">Back to the top</a>
+        <br><br>
+
+        {% for date, games in games_by_date.items() %}
+        <a href="#{{ date.strftime('%Y-%m-%d') }}">
+            {{ date.strftime('%A, %d %B, %Y') }}
+        </a>
+        <br>
+        {% endfor %}
+    </div>
 
 {% for date, games in games_by_date.items() %}
 <div class="date-header" id="{{ date.strftime('%Y-%m-%d') }}">
@@ -46,7 +52,7 @@ A program by Callum Alexander<br>
 <div class="color-key">
     <div class="key-square pale-green"></div>
     <span>Home</span>
-    <div class="key-square pale-red"></div>
+    <div class="key-square pale-orange"></div>
     <span>Away</span>
 </div>
 
@@ -69,7 +75,7 @@ A program by Callum Alexander<br>
     </thead>
     <tbody>
     {% for game in games %}
-    <tr class="{{ 'pale-green' if game.location == 'Peffermill' else 'pale-red' }}">
+    <tr class="{{ 'bright-red-row' if game.cover_team == 'no umpire available' else ('pale-green' if game.location == 'Peffermill' else 'pale-orange') }}">
         <td>{{ game.home }}</td>
         <td>{{ game.away }}</td>
         <td>{{ game.location }}</td>
@@ -84,12 +90,36 @@ A program by Callum Alexander<br>
     {% endfor %}
     </tbody>
 </table>
+    <h3>Schedule for match day {{ date.strftime('%A, %d %B, %Y') }}</h3>
+    <div class="timeline-chart">
 
-<div id="timeline-container">
-    <div id="timeline"></div>
+        {% for game in games %}
+        {% set start_interval = (((game.start_time.hour - 10) * 12) + (game.start_time.minute / 5)) | int %}
+        {% set end_interval = (((game.end_time.hour - 10) * 12) + (game.end_time.minute / 5)) | int %}
+        <div class="game-event-container {{ 'pale-green' if game.location == 'Peffermill' else 'pale-orange' }}"
+             title="Location: {{ game.location }}&#10;Start: {{ game.start_time.strftime('%H:%M') }}&#10;End: {{ game.end_time.strftime('%H:%M') }}"
+             style="grid-row-start: {{ loop.index }}; grid-column: {{ start_interval + 1 }} / {{ end_interval + 1 }};">
+            {{ game.home }} vs {{ game.away }}
+            <div class="game-event-tooltip">
+                Location: {{ game.location }}<br>
+                Start: {{ game.start_time.strftime('%H:%M') }}<br>
+                End: {{ game.end_time.strftime('%H:%M') }}
+            </div>
+        </div>
+        {% endfor %}
+
+        {% set total_rows = games|length + 1 %}
+        {% for i in range(10, 23) %}
+        {% set hour = i if i <= 12 else i-12 %}
+        {% set period = 'AM' if i < 12 or i == 24 else 'PM' %}
+        <div class="time" style="grid-row-start: {{ total_rows }}; grid-column: {{ ((i - 10) * 12) + 1 }};">{{ hour }}
+            {{ period }}
+        </div>
+        {% endfor %}
 </div>
 
-<hr>
+
+    <hr>
 {% else %}
 <h2>No games scheduled.</h2>
 {% endfor %}
@@ -107,7 +137,7 @@ A program by Callum Alexander<br>
     // Function to change the tagline
     function changeTagline() {
         const taglineElement = document.getElementById('tagline');
-        const randomTagline = `BuzzBot says, "${taglines[Math.floor(Math.random() * taglines.length)]}"`;
+        const randomTagline = `BuzzBot says, "<i>${taglines[Math.floor(Math.random() * taglines.length)]}</i>"`;
         taglineElement.innerHTML = randomTagline;
     }
 
@@ -116,6 +146,14 @@ A program by Callum Alexander<br>
     barContent.addEventListener('animationiteration', changeTagline);
 </script>
 
+</div>
+
 </body>
+
+<footer>
+    A program by Callum Alexander (<i>thecatthatbarks</i>) for <a href="https://www.euhc.co.uk/">Edinburgh University
+    Men's Hockey Club</a>
+</footer>
+
 </html>
 

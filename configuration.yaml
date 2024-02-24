@@ -1,0 +1,11 @@
+configuration:
+  teams:
+    - "1s"
+    - "2s"
+    - "3s"
+    - "4s"
+    - "5s"
+    - "6s"
+    - "7s"
+  distance_matrix_ai:
+    api_key: "API KEY HERE"

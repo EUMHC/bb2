@@ -1,3 +1,4 @@
+import random
 import time
 from itertools import groupby
 from operator import attrgetter
@@ -15,7 +16,10 @@ app = Flask(__name__)
 @app.route('/')
 def home():
     teams = buzzbot_constants.get_uni_teams()
-    matches = buzzbot.load_fixtures_from_csv("input.csv")
+    # filename = "display_test_file.csv"
+    filename = "input.csv"
+    # utils.generate_csv(filename, 5)
+    matches = buzzbot.load_fixtures_from_csv(filename)
     umpiring_count = {team: 0 for team in teams}
 
     bot = buzzbot.BuzzBot(matches, teams, umpiring_count)
@@ -30,15 +34,16 @@ def home():
 @app.errorhandler(Exception)
 def handle_exception(e):
     # You can differentiate between types of exceptions to customize the response
-    if isinstance(e, ValueError):
-        error_message = "A ValueError occurred."
+    error_messages = []
+    if isinstance(e, utils.ExceptionWithList):
+        error_messages = e.messages
     else:
         # For other types of exceptions or errors, you can use a generic message
         # or log the exception and return its text or type
-        error_message = str(e)  # or "An unexpected error has occurred."
+        error_messages.append(str(e))  # or "An unexpected error has occurred."
 
     # You can also decide to return different templates based on the error
-    return render_template('error.html', error_message=error_message), 500
+    return render_template('error.html', error_messages=error_messages), 500
 
 
 def open_browser():

@@ -5,6 +5,12 @@
     <meta charset="UTF-8">
     <title>Error</title>
     <link rel="stylesheet" type="text/css" href="static/style.css">
+
+    <style>
+        body {
+            padding-left: 5%;
+        }
+    </style>
 </head>
 <body>
 <h1>An Error Occurred</h1>
@@ -13,12 +19,24 @@
     in regard to the input format.</b> Please see the below error message that will probably help you fix the problem to
     ensure that your idiot ass doesn't do that again.</p>
 
-<h3>The error message I was talking about</h3>
+<h3>The error {{ 'messages' if error_messages|length > 1 else 'message' }} I was talking about:</h3>
 
-<div class="error-message">
-    <p>{{ error_message }}</p>
+<div class="error-messages">
+    {% if error_messages %}
+    <ul>
+        {% for message in error_messages %}
+        <div class="error-message">
+            <p>{{ message }}</p>
+        </div>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No specific error messages provided.</p>
+    {% endif %}
 </div>
 
-<a href="/">Go Back to Home</a>
+
+<h3>Please return to <code>input.csv</code> and correct your mistakes</h3>
+<a href="/">Click here to retry</a>
 </body>
 </html>

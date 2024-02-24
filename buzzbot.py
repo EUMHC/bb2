@@ -7,7 +7,7 @@ from itertools import groupby
 from operator import attrgetter
 
 from DistanceMatrixAPI import DistanceMatrixInterface, LocationManager
-from credentials import get_DistanceMatrix_credentials
+from buzzbot_constants import get_DistanceMatrix_credentials
 
 # Configuring logger
 logger = logging.getLogger("TheBuzzBot Logger")
@@ -21,9 +21,9 @@ logger.addHandler(fh)
 
 def load_fixtures_from_csv(csv_path):
     matches_ = []
-    file_ok, message = utils.validate_csv_format(csv_path)
-    if not file_ok:
-        raise Exception(f"{message}")
+    errors_exist, error_messages = utils.validate_csv_format(csv_path)
+    if errors_exist:
+        raise utils.ExceptionWithList(error_messages)
 
     try:
         with open(csv_path, newline='') as csvfile:
@@ -160,6 +160,7 @@ class BuzzBot:
         :return: String name of the best team to cover a match
         """
         eligible_teams = self.get_eligible_teams(match)
+        eligible_teams.sort()
         match.eligible_teams = eligible_teams
         if not eligible_teams:
             return "No available umpire"

@@ -12,6 +12,7 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
+    overflow-x: scroll;
 }
 
 th, td {
@@ -31,12 +32,9 @@ th {
     background-color: #ccffcc;
 }
 
-/* Pale green background */
-.pale-red {
-    background-color: #ffcccc;
+.pale-orange {
+    background-color: #fde8d7;
 }
-
-/* Pale red background */
 
 .color-key {
     display: flex;
@@ -60,8 +58,12 @@ th {
     font-size: 14px; /* Adjust based on preference */
 }
 
+.content {
+    padding: 60px 10px 20px;
+}
+
 .bar {
-    position: relative;
+    position: fixed;
     top: 0;
     left: 0;
 
@@ -71,8 +73,8 @@ th {
     background-color: #add8e6; /* Pastel blue */
     color: black;
 
-    font-family: Kode-Mono;
-    font-size: 18px;
+    font-size: 25px;
+    z-index: 1000;
 }
 
 .bar_content {
@@ -95,7 +97,7 @@ th {
 .sidebar {
     position: fixed; /* Or `absolute` if you prefer */
     left: 0;
-    top: 0;
+    top: 6.8%;
     width: 200px; /* Adjust width as needed */
     height: 100%;
     overflow-y: auto; /* Enable scrolling if the content is too long */
@@ -103,27 +105,74 @@ th {
     padding: 20px;
 }
 
+.timeline-chart {
+    display: grid;
+    grid-template-columns: repeat(144, 1fr); /* 144 columns for 12 hours at 5-minute intervals */
+    grid-auto-rows: minmax(50px, auto); /* Adjust row height as needed */
+    gap: 2px; /* Smaller gap for a more compact layout */
+    padding: 20px;
+    background-color: #f4f4f4;
+    position: relative; /* For absolute positioning of ticks */
+}
 
-#timeline-container {
+.game-event-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: black;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+
+.timeline {
+    grid-row-start: auto;
     width: 100%;
-    overflow-x: scroll;
+    /* Ensure the timeline is always the last row */
+    grid-row: -1;
+    /* Additional styling */
+}
+
+.time {
+    text-align: left; /* Align text to the left */
+    padding: 5px;
+    color: #333;
+    position: relative; /* For absolute positioning of ticks */
+}
+
+.time::before {
+    content: '';
+    position: absolute;
+    top: -10px; /* Position the tick above the label */
+    left: 0%; /* Align to the left edge of the cell */
+    width: 2px; /* Thickness of the tick */
+    height: 15px; /* Length of the tick */
+    background-color: #333;
+}
+
+.game-event-tooltip {
+    display: none;
+    position: absolute;
+    z-index: 1;
+    bottom: 100%; /* Position above the game-event-container */
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 5px;
+    background: #fff;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 5px;
     white-space: nowrap;
 }
 
-#timeline {
-    position: relative;
-    height: 100px;
-    background-color: #f0f0f0;
+.game-event-container:hover .game-event-tooltip {
+    display: block;
 }
 
-.event {
-    position: absolute;
-    height: 80%;
-    bottom: 10%;
-    background-color: lightblue;
-    border-radius: 5px;
-    padding: 5px;
-}
+
+
+
+
 
 .error-message {
     background-color: #ffdddd; /* Light red background */
@@ -139,5 +188,24 @@ th {
 .error-message p {
     margin: 0; /* Removes default margin from the paragraph to control spacing more precisely */
     padding: 0; /* Removes default padding for similar reasons */
+}
+
+
+.bright-red-row {
+    background-color: #ffdddd; /* Light red background similar to .error-message */
+    color: #d8000c; /* Dark red text color for contrast and readability */
+    /* Borders in table rows behave differently than divs.
+       If you want a left border effect, consider using a pseudo-element or first cell styling */
+}
+
+.bright-red-row td:first-child {
+    border-left: 6px solid #f44336; /* Darker red border on the left for emphasis */
+    padding-left: 14px; /* Adjust padding to compensate for the border */
+}
+
+/* Optional: Apply styling to text within the row for consistency */
+.bright-red-row td {
+    font-size: 16px; /* Slightly larger font size for clarity */
+    font-family: Arial, sans-serif; /* Consistent font */
 }
 
