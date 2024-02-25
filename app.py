@@ -16,9 +16,11 @@ app = Flask(__name__)
 @app.route('/')
 def home():
     teams = buzzbot_constants.get_uni_teams()
+
     # filename = "display_test_file.csv"
     filename = "input.csv"
     # utils.generate_csv(filename, 5)
+
     matches = buzzbot.load_fixtures_from_csv(filename)
     umpiring_count = {team: 0 for team in teams}
 

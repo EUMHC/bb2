@@ -11,7 +11,7 @@
 
 <div class="bar">
         <span class="bar_content" id="tagline">
-            BuzzBot says, "<i>{{ taglines[0] }}</i>"
+            &#x1F916;  BuzzBot says, "<i>{{ taglines[0] }}</i>"
         </span>
 </div>
 
@@ -31,10 +31,8 @@
 
         <h3>The BuzzBot</h3>
 
-        <h4>Quick Navigation</h4>
-
         <a href="#top">Back to the top</a>
-        <br><br>
+        <h4>Quick Navigation</h4>
 
         {% for date, games in games_by_date.items() %}
         <a href="#{{ date.strftime('%Y-%m-%d') }}">
@@ -103,7 +101,8 @@
             <div class="game-event-tooltip">
                 Location: {{ game.location }}<br>
                 Start: {{ game.start_time.strftime('%H:%M') }}<br>
-                End: {{ game.end_time.strftime('%H:%M') }}
+                End: {{ game.end_time.strftime('%H:%M') }}<br>
+                Covering team: {{ game.covering_team }}
             </div>
         </div>
         {% endfor %}
@@ -127,17 +126,12 @@
 
 <script>
     // Convert your taglines array to JavaScript
-    const taglines = {
-    {
-        taglines | tojson
-    }
-    }
-    ;
+    const taglines = {{ taglines | tojson }};
 
     // Function to change the tagline
     function changeTagline() {
         const taglineElement = document.getElementById('tagline');
-        const randomTagline = `BuzzBot says, "<i>${taglines[Math.floor(Math.random() * taglines.length)]}</i>"`;
+        const randomTagline = `&#x1F916; BuzzBot says, "<i>${taglines[Math.floor(Math.random() * taglines.length)]}</i>"`;
         taglineElement.innerHTML = randomTagline;
     }
 

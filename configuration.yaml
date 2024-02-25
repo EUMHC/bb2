@@ -9,3 +9,6 @@ configuration:
     - "7s"
   distance_matrix_ai:
     api_key: "API KEY HERE"
+
+  taglines:
+  - On a warm summers evening, on a train bound for nowhere, I met up with the Gambler

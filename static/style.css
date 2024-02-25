@@ -70,8 +70,8 @@ th {
     width: 100%;
     padding: 10px 0;
 
-    background-color: #add8e6; /* Pastel blue */
-    color: black;
+    background-color: #007B17; /* Pastel blue */
+    color: white;
 
     font-size: 25px;
     z-index: 1000;
@@ -121,7 +121,7 @@ th {
     justify-content: center;
     color: black;
     padding: 10px;
-    border-radius: 5px;
+    border: 1px solid gray;
 }
 
 
