@@ -40,6 +40,7 @@ for EUMHC together at the same time. Then times that by 10 million.`
 
 taglines = buzzbot_constants.get_taglines()
 
+
 def get_opening_tagline():
     return random.choice(taglines)
 
@@ -110,7 +111,8 @@ def validate_csv_format(file_path):
 
             if not row[3].isdigit():
                 errors_exist = True
-                errors.append(f"Row {row_number} - {row} - the umpires_needed value is not a number. It is instead {row[3]}")
+                errors.append(
+                    f"Row {row_number} - {row} - the umpires_needed value is not a number. It is instead {row[3]}")
 
             if int(row[3]) < 0 or int(row[3]) > 2:
                 errors_exist = True

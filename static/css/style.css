@@ -70,7 +70,7 @@ th {
     width: 100%;
     padding: 10px 0;
 
-    background-color: #007B17; /* Pastel blue */
+    background-color: #007B17; /*EUMHC Green*/
     color: white;
 
     font-size: 25px;
@@ -78,16 +78,13 @@ th {
 }
 
 .bar_content {
-    display: block; /* Important to give the content a width */
-
-    width: 100%;
-    transform: translateX(100%); /* Animation start out of the screen */
-
-    /* Add the animation */
-    animation: move 30s linear infinite /* infinite make reapeat the animation indefinitely */;
+    margin-left: 120px; /* Adjust based on the size of the live-time display */
+    display: block;
+    width: calc(100% - 120px); /* Adjust width to accommodate time display */
+    transform: translateX(100%);
+    animation: move 30s linear infinite;
 }
 
-/* Create the animation */
 @keyframes move {
     to {
         transform: translateX(-100%);
@@ -95,24 +92,24 @@ th {
 }
 
 .sidebar {
-    position: fixed; /* Or `absolute` if you prefer */
+    position: fixed;
     left: 0;
     top: 6.8%;
-    width: 200px; /* Adjust width as needed */
+    width: 200px;
     height: 100%;
-    overflow-y: auto; /* Enable scrolling if the content is too long */
-    background-color: #f0f0f0; /* Light grey background */
+    overflow-y: auto;
+    background-color: #f0f0f0;
     padding: 20px;
 }
 
 .timeline-chart {
     display: grid;
     grid-template-columns: repeat(144, 1fr); /* 144 columns for 12 hours at 5-minute intervals */
-    grid-auto-rows: minmax(50px, auto); /* Adjust row height as needed */
-    gap: 2px; /* Smaller gap for a more compact layout */
+    grid-auto-rows: minmax(50px, auto);
+    gap: 2px;
     padding: 20px;
     background-color: #f4f4f4;
-    position: relative; /* For absolute positioning of ticks */
+    position: relative;
 }
 
 .game-event-container {
@@ -128,16 +125,14 @@ th {
 .timeline {
     grid-row-start: auto;
     width: 100%;
-    /* Ensure the timeline is always the last row */
     grid-row: -1;
-    /* Additional styling */
 }
 
 .time {
-    text-align: left; /* Align text to the left */
+    text-align: left;
     padding: 5px;
     color: #333;
-    position: relative; /* For absolute positioning of ticks */
+    position: relative;
 }
 
 .time::before {

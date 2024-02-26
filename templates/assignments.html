@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="static/style.css">
+    <link rel="stylesheet" type="text/css" href="static/css/style.css">
     <title>The BuzzBot</title>
 </head>
 
 <body>
 
 <div class="bar">
-        <span class="bar_content" id="tagline">
-            &#x1F916;  BuzzBot says, "<i>{{ taglines[0] }}</i>"
-        </span>
+    <span class="bar_content" id="tagline">
+        &#x1F916;  BuzzBot says, "<i>{{ taglines[0] }}</i>"
+    </span>
 </div>
 
 <div class="content">
@@ -21,7 +21,7 @@
         <h1>EUMHC BuzzBot Umpiring Assignments</h1>
     </div>
     A program by Callum Alexander<br>
-
+    
     <em>"If the EUHC Cinematic Universe allowed Jack Mead, Ed Bury, and I to do the umpiring assignments for EUMHC
         together
         at the same time. Then times that by 10 million. That is The BuzzBot"</em>
@@ -44,8 +44,9 @@
 
 {% for date, games in games_by_date.items() %}
 <div class="date-header" id="{{ date.strftime('%Y-%m-%d') }}">
-    <h2>Assignments for {{ date.strftime('%A, %d %B, %Y') }}</h2>
+    <h2><u>Assignments for {{ date.strftime('%A, %d %B, %Y') }}</u></h2>
 </div>
+
 
 <div class="color-key">
     <div class="key-square pale-green"></div>
@@ -145,7 +146,7 @@
 </body>
 
 <footer>
-    A program by Callum Alexander (<i>thecatthatbarks</i>) for <a href="https://www.euhc.co.uk/">Edinburgh University
+    A program by <a href="https://github.com/CallumAlexander" title="EUMHC 2019-2024&#10;Vice President 2022/23&#10;Website & Publicity Secretary 2020+1/22&#10;Edinburgh University Colours 2023">Callum Alexander</a> (<i title="I use Vim btw">thecatthatbarks</i>) for <a href="https://www.euhc.co.uk/" title="You gotta know when to hold em&#10;Know when to fold em">Edinburgh University
     Men's Hockey Club</a>
 </footer>
 
