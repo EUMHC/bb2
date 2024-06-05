@@ -1,154 +1,241 @@
-<!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="static/css/style.css">
-    <title>The BuzzBot</title>
-</head>
+{% extends "base.html" %}
 
-<body>
-
-<div class="bar">
-    <span class="bar_content" id="tagline">
-        &#x1F916;  BuzzBot says, "<i>{{ taglines[0] }}</i>"
-    </span>
-</div>
-
-<div class="content">
-
-    <div id="top">
-        <h1>EUMHC BuzzBot Umpiring Assignments</h1>
-    </div>
-    A program by Callum Alexander<br>
-    
-    <em>"If the EUHC Cinematic Universe allowed Jack Mead, Ed Bury, and I to do the umpiring assignments for EUMHC
-        together
-        at the same time. Then times that by 10 million. That is The BuzzBot"</em>
-
-
-    <div class="sidebar">
-
-        <h3>The BuzzBot</h3>
-
-        <a href="#top">Back to the top</a>
-        <h4>Quick Navigation</h4>
+{% block nav %}
 
         {% for date, games in games_by_date.items() %}
-        <a href="#{{ date.strftime('%Y-%m-%d') }}">
-            {{ date.strftime('%A, %d %B, %Y') }}
-        </a>
-        <br>
+        <div class="nav-button"><i class="fas fixture-{{ date.strftime('%Y-%m-%d') }}"></i><span><a href="#{{ date.strftime('%Y-%m-%d') }}">{{ date.strftime('%A, %d %B, %Y') }}</a></span></div>
         {% endfor %}
-    </div>
 
-{% for date, games in games_by_date.items() %}
-<div class="date-header" id="{{ date.strftime('%Y-%m-%d') }}">
-    <h2><u>Assignments for {{ date.strftime('%A, %d %B, %Y') }}</u></h2>
-</div>
+{% endblock %}
 
+{% block content %}
 
-<div class="color-key">
-    <div class="key-square pale-green"></div>
-    <span>Home</span>
-    <div class="key-square pale-orange"></div>
-    <span>Away</span>
-</div>
-
-<div class="disclaimer-banner">
-    DISCLAIMER: Always doublecheck and cross-reference umpiring assignments given by The BuzzBot
-</div>
-
-<table>
-    <thead>
-    <tr>
-        <th>Uni Team</th>
-        <th>Opposition</th>
-        <th>Location</th>
-        <th>Pushback</th>
-        <th>End Time</th>
-        <th>Umpiring Team</th>
-        <th>Umpires Needed</th>
-        <th>Eligible Teams</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for game in games %}
-    <tr class="{{ 'bright-red-row' if game.cover_team == 'no umpire available' else ('pale-green' if game.location == 'Peffermill' else 'pale-orange') }}">
-        <td>{{ game.home }}</td>
-        <td>{{ game.away }}</td>
-        <td>{{ game.location }}</td>
-        <!--                        <td>{{ game.start_time.strftime('%Y-%m-%d %H:%M') }}</td>-->
-        <!--                        <td>{{ game.end_time.strftime('%Y-%m-%d %H:%M') }}</td>-->
-        <td>{{ game.start_time.strftime('%H:%M') }}</td>
-        <td>{{ game.end_time.strftime('%H:%M') }}</td>
-        <td><b>{{ game.covering_team }}</b></td>
-        <td>{{ game.umpires_required }}</td>
-        <td>{{ game.eligible_teams|join(', ') }}</td>
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
-    <h3>Schedule for match day {{ date.strftime('%A, %d %B, %Y') }}</h3>
-    <div class="timeline-chart">
-
-        {% for game in games %}
-        {% set start_interval = (((game.start_time.hour - 10) * 12) + (game.start_time.minute / 5)) | int %}
-        {% set end_interval = (((game.end_time.hour - 10) * 12) + (game.end_time.minute / 5)) | int %}
-        <div class="game-event-container {{ 'pale-green' if game.location == 'Peffermill' else 'pale-orange' }}"
-             title="Location: {{ game.location }}&#10;Start: {{ game.start_time.strftime('%H:%M') }}&#10;End: {{ game.end_time.strftime('%H:%M') }}"
-             style="grid-row-start: {{ loop.index }}; grid-column: {{ start_interval + 1 }} / {{ end_interval + 1 }};">
-            {{ game.home }} vs {{ game.away }}
-            <div class="game-event-tooltip">
-                Location: {{ game.location }}<br>
-                Start: {{ game.start_time.strftime('%H:%M') }}<br>
-                End: {{ game.end_time.strftime('%H:%M') }}<br>
-                Covering team: {{ game.covering_team }}
+    <div id="top">
+        <div class="masthead">
+            <h1>EUMHC BuzzBot Umpiring Assignments</h1>
+            <div class="subtitle">
+                <p class="program-by">A program by Callum Alexander</p>
+                <p class="quote">
+                    <em>"If the EUHC Cinematic Universe allowed Jack Mead, Ed Bury, and I to do the umpiring assignments for EUMHC together at the same time. Then times that by 10 million. That is The BuzzBot"</em>
+                </p>
             </div>
         </div>
-        {% endfor %}
+    </div>
 
-        {% set total_rows = games|length + 1 %}
-        {% for i in range(10, 23) %}
-        {% set hour = i if i <= 12 else i-12 %}
-        {% set period = 'AM' if i < 12 or i == 24 else 'PM' %}
-        <div class="time" style="grid-row-start: {{ total_rows }}; grid-column: {{ ((i - 10) * 12) + 1 }};">{{ hour }}
-            {{ period }}
+    <div class="upload-container">
+        <h2>Upload Fixtures CSV File</h2>
+        <form action="{{ url_for('upload_and_process_file') }}" method="post" enctype="multipart/form-data"
+              class="file-input" id="uploadForm">
+            <input type="file" name="file" value="Browse for file..." id="file" onchange="updateFileName()">
+            <label for="file"></label>
+            <input type="submit" value="Assign umpires" class="upload-btn">
+        </form>
+        <div class="file-name" id="fileName"></div>
+    </div>
+
+    <div id="notification-banner-container"></div>
+
+    {% for date, games in games_by_date.items() %}
+    <div class="date-section">
+        <div class="date-header" id="{{ date.strftime('%Y-%m-%d') }}">
+            <div class="date-title">
+                <h2><u>Assignments for {{ date.strftime('%A, %d %B, %Y') }}</u></h2>
+            </div>
+            <div class="additional-info">
+
+                {% set location_to_count = 'Peffermill' %}
+                {% set home_count = games|selectattr('location', 'equalto', location_to_count)|list|length %}
+
+                {% set no_umpire_value = 'No available umpire'%}
+                {% set no_umpire_count = games | selectattr('covering_team', 'equalto', no_umpire_value) | list | length %}
+
+                <h4>{{ games | length }} games for this matchday</h4>
+                <p class="pale-green">{{ home_count }} home games</p>
+                <p class="pale-orange">{{ (games | length) - home_count }} away games</p>
+
+                {% if no_umpire_count > 0 %}
+                    <p class="no-umpire-count-value no-umpire-red" data-date="{{ date.strftime('%A, %d %B, %Y') }}" style="color: white;">{{ no_umpire_count }} games not covered</p>
+                {% else %}
+                    <p class="all-good pale-green">&#x2705; All matches can be covered</p>
+                {% endif %}
+            </div>
         </div>
-        {% endfor %}
+
+
+    <div class="collapsible-content">
+        <div class="color-key">
+            <div class="key-square pale-green"></div>
+            <span>Home</span>
+            <div class="key-square pale-orange"></div>
+            <span>Away</span>
+            <div class="key-square no-umpire-red"></div>
+            <span>No available umpire</span>
+        </div>
+
+        <div class="disclaimer-banner">
+            DISCLAIMER: Always doublecheck and cross-reference umpiring assignments given by The BuzzBot
+        </div>
+
+        <table>
+            <thead>
+            <tr>
+                <th>Uni Team</th>
+                <th>Opposition</th>
+                <th>Location</th>
+                <th>Pushback</th>
+                <th>End Time</th>
+                <th>Umpiring Team</th>
+                <th>Umpires Needed</th>
+                <th>Eligible Teams</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for game in games %}
+            <tr class="{{ 'bright-red-row' if game.covering_team == 'No available umpire' else ('pale-green' if game.location == 'Peffermill' else 'pale-orange') }}">
+                <td>{{ game.home }}</td>
+                <td>{{ game.away }}</td>
+                <td>{{ game.location }}</td>
+                <!--                        <td>{{ game.start_time.strftime('%Y-%m-%d %H:%M') }}</td>-->
+                <!--                        <td>{{ game.end_time.strftime('%Y-%m-%d %H:%M') }}</td>-->
+                <td>{{ game.start_time.strftime('%H:%M') }}</td>
+                <td>{{ game.end_time.strftime('%H:%M') }}</td>
+                <td><b>{{ game.covering_team }}</b></td>
+                <td>{{ game.umpires_required }}</td>
+                <td>{{ game.eligible_teams|join(', ') }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <h3>Schedule for match day {{ date.strftime('%A, %d %B, %Y') }}</h3>
+            <div class="timeline-chart">
+
+                {% for game in games %}
+                {% set start_interval = (((game.start_time.hour - 10) * 12) + (game.start_time.minute / 5)) | int %}
+                {% set end_interval = (((game.end_time.hour - 10) * 12) + (game.end_time.minute / 5)) | int %}
+                <div class="game-event-container {{ 'pale-green' if game.location == 'Peffermill' else 'pale-orange' }}"
+                     title="Location: {{ game.location }}&#11;Start: {{ game.start_time.strftime('%H:%M') }}&#10;End: {{ game.end_time.strftime('%H:%M') }}"
+                     style="grid-row-start: {{ loop.index }}; grid-column: {{ start_interval + 1 }} / {{ end_interval + 1 }};">
+                    {{ game.home }} vs {{ game.away }}
+                    <div class="game-event-tooltip">
+                        Location: {{ game.location }}<br>
+                        Start: {{ game.start_time.strftime('%H:%M') }}<br>
+                        End: {{ game.end_time.strftime('%H:%M') }}<br>
+                        Covering team: {{ game.covering_team }}
+                    </div>
+                </div>
+                {% endfor %}
+
+                {% set total_rows = games|length + 1 %}
+                {% for i in range(10, 23) %}
+                {% set hour = i if i <= 12 else i-12 %}
+                {% set period = 'AM' if i < 12 or i == 24 else 'PM' %}
+                <div class="time" style="grid-row-start: {{ total_rows }}; grid-column: {{ ((i - 10) * 12) + 1 }};">{{ hour }}
+                    {{ period }}
+                </div>
+                {% endfor %}
+        </div>
+    </div>
 </div>
 
 
     <hr>
-{% else %}
-<h2>No games scheduled.</h2>
-{% endfor %}
+    {% else %}
+    <h2>No games scheduled.</h2>
+    {% endfor %}
+
+{% endblock %}
+
+{% block scripts %}
+
+    <script>
+        function updateFileName() {
+            var input = document.getElementById('file');
+            var fileName = document.getElementById('fileName');
+            fileName.innerHTML = input.files[0].name;
+        }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        var headers = document.querySelectorAll('.date-header');
+        headers.forEach(function (header) {
+            header.addEventListener('click', function () {
+                var content = this.nextElementSibling;
+                content.classList.toggle('active');
+            });
+        });
+    });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        var bannerContainer = document.getElementById('notification-banner-container');
+
+        // Function to create and display the notification banner
+        function createBanner(noUmpireElement) {
+            // Check if the banner already exists
+            if (document.querySelector('.notification-banner')) return;
+
+            var date = noUmpireElement.getAttribute('data-date');
+
+            // Create the banner
+            var banner = document.createElement('div');
+            banner.className = 'notification-banner';
+            banner.innerHTML = `
+                <p>&#x203C; ${noUmpireElement.textContent} on ${date}. <a href="#${noUmpireElement.closest('.date-section').querySelector('.date-header').id}">Jump to date</a></p>
+                <button class="close-banner">X</button>
+            `;
+
+            // Append the banner to the container
+            bannerContainer.appendChild(banner);
+
+            // Show the banner with animation
+            setTimeout(() => {
+                banner.classList.add('show');
+            }, 100); // Small delay to trigger CSS animation
+
+            // Add event listener to close the banner
+            banner.querySelector('.close-banner').addEventListener('click', function () {
+                banner.classList.remove('show');
+                banner.classList.add('hide');
+                setTimeout(() => {
+                    banner.style.display = 'none';
+                }, 500); // Match the transition duration
+            });
+
+            // Smooth scroll to the date section when the link is clicked
+            banner.querySelector('a').addEventListener('click', function (event) {
+                event.preventDefault();
+                document.getElementById(this.getAttribute('href').substring(1)).scrollIntoView({ behavior: 'smooth' });
+            });
+        }
+
+        // MutationObserver to watch for changes in the DOM
+        var observer = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    mutation.addedNodes.forEach(function (node) {
+                        if (node.nodeType === Node.ELEMENT_NODE && node.classList.contains('no-umpire-count-value')) {
+                            createBanner(node);
+                        }
+                    });
+                }
+            });
+        });
+
+        // Start observing the entire document for added nodes
+        observer.observe(document.body, { childList: true, subtree: true });
+
+        // Initial check in case the element is already in the DOM
+        var initialElement = document.querySelector('.no-umpire-count-value');
+        if (initialElement) {
+            createBanner(initialElement);
+        }
+    });
 
 
-<script>
-    // Convert your taglines array to JavaScript
-    const taglines = {{ taglines | tojson }};
 
-    // Function to change the tagline
-    function changeTagline() {
-        const taglineElement = document.getElementById('tagline');
-        const randomTagline = `&#x1F916; BuzzBot says, "<i>${taglines[Math.floor(Math.random() * taglines.length)]}</i>"`;
-        taglineElement.innerHTML = randomTagline;
-    }
+    </script>
 
-    // Listen for the end of the animation
-    const barContent = document.querySelector('.bar_content');
-    barContent.addEventListener('animationiteration', changeTagline);
-</script>
-
-</div>
-
-</body>
-
-<footer>
-    A program by <a href="https://github.com/CallumAlexander" title="EUMHC 2019-2024&#10;Vice President 2022/23&#10;Website & Publicity Secretary 2020+1/22&#10;Edinburgh University Colours 2023">Callum Alexander</a> (<i title="I use Vim btw">thecatthatbarks</i>) for <a href="https://www.euhc.co.uk/" title="You gotta know when to hold em&#10;Know when to fold em">Edinburgh University
-    Men's Hockey Club</a>
-</footer>
-
-</html>
+{% endblock %}
 

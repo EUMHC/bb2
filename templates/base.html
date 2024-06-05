@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="static/css/style.css">
+    <title>The BuzzBot</title>
+</head>
+
+<body>
+
+<div class="bar">
+    <span class="bar_content" id="tagline">
+        &#x1F916;  BuzzBot says, "<i>{{ config.settings['taglines'][0] }}</i>"
+    </span>
+</div>
+
+<div class="content">
+
+    <div id="nav-bar">
+        <input type="checkbox" id="nav-toggle">
+        <div id="nav-header">
+            <div id="nav-title">The BuzzBot</div>
+            <label for="nav-toggle">
+                <span id="nav-toggle-burger"></span>
+            </label>
+            <hr>
+        </div>
+        <div id="nav-content">
+            <div class="nav-button"><i class="fas fa-palette"></i><span><a href="{{ url_for('upload_and_process_file') }}">&#x1F3E0; Home</a></span></div>
+            <div class="nav-button"><i class="fas fa-images"></i><span> <a href="{{ url_for('settings') }}">&#x2699; Settings</a></span></div>
+            <div class="nav-button"><i class="fas fa-thumbtack"></i><span><a href="{{ url_for('locations') }}">&#x1F4CD; Locations</a></span></div>
+            {% block nav %}
+            {% endblock%}
+            <hr>
+            <div id="nav-content-highlight"></div>
+        </div>
+        <input type="checkbox" id="nav-footer-toggle">
+        <div id="nav-footer">
+            <div id="nav-footer-heading">
+                <div id="nav-footer-avatar">
+                    <img src="https://gravatar.com/avatar/4474ca42d303761c2901fa819c4f2547" alt="Avatar">
+                </div>
+                <div id="nav-footer-titlebox">
+                    <a id="nav-footer-title" href="https://www.wikipedia.com" target="_blank">Kenny Rogers</a>
+                    <span id="nav-footer-subtitle">Admin</span>
+                </div>
+                <label for="nav-footer-toggle">
+                    <i class="fas fa-caret-up"></i>
+                </label>
+            </div>
+            <div id="nav-footer-content">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </div>
+        </div>
+    </div>
+
+<!--    <div class="sidebar">-->
+
+<!--        <h3>The BuzzBot</h3>-->
+
+<!--        <a href="{{ url_for('upload_and_process_file') }}">Home</a><br>-->
+<!--        <a href="{{ url_for('settings') }}">Settings</a><br>-->
+<!--        <a href="{{ url_for('locations') }}">Locations</a><br>-->
+<!--        <h4>Quick Navigation</h4>-->
+
+
+<!--    </div>-->
+
+<!--    <div class="sidebar-toggle">☰</div>-->
+
+    {% block content %}
+
+    {% endblock %}
+
+
+    <script>
+        // Convert your taglines array to JavaScript
+        const taglines = {{ config.settings['taglines'] | tojson }};
+
+        function changeTagline() {
+            const taglineElement = document.getElementById('tagline');
+            const randomTagline = `&#x1F916; BuzzBot says, "<i>${taglines[Math.floor(Math.random() * taglines.length)]}</i>"`;
+            taglineElement.innerHTML = randomTagline;
+        }
+
+        const barContent = document.querySelector('.bar_content');
+        barContent.addEventListener('animationiteration', changeTagline);
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var sidebar = document.querySelector('.sidebar');
+            var toggleButton = document.querySelector('.sidebar-toggle');
+
+            toggleButton.addEventListener('click', function () {
+                sidebar.classList.toggle('expanded');
+            });
+        });
+
+    </script>
+
+    {% block scripts %}{% endblock %}
+
+</div>
+
+</body>
+
+<footer>
+    A program by <a href="https://github.com/CallumAlexander"
+                    title="EUMHC 2019-2024&#10;Vice President 2022/23&#10;Website & Publicity Secretary 2020+1/22&#10;Edinburgh University Colours 2023">Callum
+    Alexander</a> (<i title="I use Vim btw">thecatthatbarks</i>) for <a href="https://www.euhc.co.uk/"
+                                                                        title="You gotta know when to hold em&#10;Know when to fold em">Edinburgh
+    University
+    Men's Hockey Club</a>
+</footer>
+
+</html>

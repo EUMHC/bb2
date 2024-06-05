@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h2>Settings</h2>
+
+    <form method="post">
+        <label for="dm_ai_api_key">DistanceMatrix.AI API Key:</label>
+        <input type="password" id="dm_ai_api_key" name="dm_ai_api_key" value="{{ config.settings['distance_matrix_ai']['api_key'] }}">
+        <i class="api-key-toggle" id="toggleAPIkey" style="width: 50vw;">Show</i>
+        <br><br>
+
+
+        <label for="setting2">Taglines for The BuzzBot to say:</label>
+        <textarea rows="5" cols="80" id="taglines_input" name="taglines_input" value="{{ config.settings['taglines'] }}"></textarea><br><br>
+
+        <input type="submit" value="Save settings">
+    </form>
+
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+        const apiField = document.getElementById('dm_ai_api_key');
+        const toggleButton = document.getElementById('toggleAPIkey');
+
+        toggleButton.addEventListener('click', function() {
+            const type = apiField.getAttribute('type') === 'password' ? 'text' : 'password';
+            apiField.setAttribute('type', type);
+            toggleButton.textContent = type === 'password' ? 'Show' : 'Hide';
+        });
+</script>
+{% endblock %}

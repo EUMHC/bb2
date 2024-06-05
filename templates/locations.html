@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h2>Match Locations</h2>
+
+
+    <table id="location-table">
+        <thead>
+        <tr>
+            <th>Location Name</th>
+            <th>Latitude</th>
+            <th>Longitude</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for location, coords in locs.items() %}
+        <tr>
+            <td>{{ location }}</td>
+            <td>{{ coords[0] }}</td>
+            <td>{{ coords[1] }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+
+    </table>
+
+    <button class="add-row-btn" onclick="addRow()">Add Row</button>
+
+    <button id="openModalBtn">Help?</button>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>How to add match locations?</h2>
+            <p>In order for <i>The BuzzBot</i> to function properly, it requires the locations of where matches take place. Each location requires <b>three</b> pieces of information:</p>
+            <ol>
+                <li>The name of the location</li>
+                <li>Its latitude</li>
+                <li>Its longitude</li>
+            </ol>
+            <p>The name of the location should be given to you by your opposition, or it will be Peffermill (which is already present).</p>
+            <h3>How to find lat-long coordinates?</h3>
+            <p>There are multiple websites available online that will allow you to either input an address or drop a pin on a map to return the latitude and longitude values of a geographical spot.</p>
+            <p>My recommendation is to use <a href="https://www.openstreetmap.org/" target="_blank">OpenStreetMap</a>. It is an <a href="https://en.wikipedia.org/wiki/Open_source" target="_blank">open source</a> alternative to similar services such as Google Maps and Apple Maps. It possesses fewer cutting edge features, but has far greater mapping detail, akin to Ordnance Survey maps.</p>
+            <p>The current version of OpenStreetMap allows you to search for addresses and places like Google and Apple Maps. However, locations like hockey pitches don't really have recorded latitude longitude coordinates because hockey pitches are an area of land rather than a point on a map.</p>
+            <p>To get the latlong of a hockey pitch on OpenStreeMap, simply:</p>
+            <ol>
+                <li>Search for the name of the hockey pitch where a fixture is meant to play</li>
+                <li>Right-click on a general spot on the hockey pitch or near the venue entrance and select "<i>Show address</i>".</li>
+                <li>On the left hand sidebar with the location information you will find the latitude longitude values of the point where you right-clicked, in the formal of <i>Latitude, Longitude</i>.</li>
+            </ol>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+    <script>
+<!--        Script for loading the modal help window -->
+        document.addEventListener("DOMContentLoaded", function () {
+            var modal = document.getElementById("myModal");
+            var btn = document.getElementById("openModalBtn");
+            var span = document.getElementsByClassName("close")[0];
+
+            btn.onclick = function () {
+                modal.style.display = "block";
+            }
+
+            span.onclick = function () {
+                modal.style.display = "none";
+            }
+
+            window.onclick = function (event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+        });
+    </script>
+
+    <script>
+        function addRow() {
+            var table = document.getElementById("location-table").getElementsByTagName('tbody')[0];
+            var newRow = table.insertRow(table.rows.length);
+
+            var cell1 = newRow.insertCell(0);
+            var cell2 = newRow.insertCell(1);
+            var cell3 = newRow.insertCell(2);
+
+            cell1.innerHTML = '<input type="text" class="location-name">';
+            cell2.innerHTML = '<input type="text" class="latitude">';
+            cell3.innerHTML = '<input type="text" class="longitude">';
+        }
+    </script>
+
+
+{% endblock %}
+
+
+

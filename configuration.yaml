@@ -1,14 +1,56 @@
-configuration:
-  teams:
-    - "1s"
-    - "2s"
-    - "3s"
-    - "4s"
-    - "5s"
-    - "6s"
-    - "7s"
-  distance_matrix_ai:
-    api_key: "API KEY HERE"
-
-  taglines:
-  - On a warm summers evening, on a train bound for nowhere, I met up with the Gambler
+distance_matrix_ai:
+  api_key:
+taglines:
+- On a warm summers evening, on a train bound for nowhere, I met up with the Gambler
+- Ted Porter should do a pint
+- Jack Mead was the Greatest Vice President of All Time
+- Joe Hutcheson stole your keys last social
+- Stand up if you hate the 1s
+- Stand up if you hate the 2s
+- The 2s are in their beds
+- See it off fresher!
+- '@Jack Jamieson'
+- Have you tried calling it?
+- 7s on fire, your defence is terrified
+- I fucking love Bag Carrier. Or is it Carrier Bag?
+- El presidente; the big cheese; head honcho
+- ''
+- See Mr Mike Arkley for specialist advice
+- Spartacus - a famous Roman general, well known throughout the hockey club
+- Special thanks must go to Fraser Dawson (Chunky), Club Secretary 2001-2002
+- ''
+- 2007/08 Social Secretary, Rupert Barker, is The One
+- Max Abbot is going to Exeter
+- Saw your mom, she forgot that I existed
+- Fives for a pint?
+- Joe Hutcheson has your phone, your keys, and your back line from the last social
+- BTBBBW
+- Shand is probably fuming right now
+- Mackie had a dream
+- MOM Bill, DOD Marc
+- Ritchie actually cannot swim
+- You need this computer program to do a better job as fixtures than Callum Groeger
+- Hutchy has no knees
+- I propose a game of 20+1 to my right
+- Can you see the moon?
+- I use arch btw
+- I use VIM btw
+- Second floor, north-east corner of the library is the best place to study on campus
+- I greatly dislike Microsoft
+- If you use a macbook, you need to grow up
+- Chiiiiiiiickeeennnnnnnnnnnnnn GOGGLES!
+- The silky Scotsman is just who we need, he won BUCS Gold for Edinburgh 3s
+- Joe Hutcheson or Dax Traill. Who was the greatest Secretary?
+- Bless the maker and his water
+- Long live the fighters
+- 2020+1/22 was our Golden Season
+- The next man to win an award at SU Ball will be a real club badger indeed
+- JP & Sonny were the best
+teams:
+- 1s
+- 2s
+- 3s
+- 4s
+- 5s
+- 6s
+- 7s

@@ -6,6 +6,8 @@ import subprocess
 from datetime import datetime, timedelta
 from difflib import SequenceMatcher
 
+from buzzbot_constants import buzzbotConfiguration
+
 import DistanceMatrixAPI
 import buzzbot_constants
 
@@ -38,7 +40,7 @@ for EUMHC together at the same time. Then times that by 10 million.`
     print(ascii_art)
 
 
-taglines = buzzbot_constants.get_taglines()
+taglines = buzzbotConfiguration.settings['taglines']
 
 
 def get_opening_tagline():
@@ -77,7 +79,7 @@ def validate_csv_format(file_path):
     correct_locations = lm.get_all_location_names()
     errors = []
     errors_exist = False
-    teams = buzzbot_constants.get_uni_teams()
+    teams = buzzbotConfiguration.settings['teams']
     expected_headers = ['uni_team', 'opposition', 'start_time', 'umpires_needed', 'location']  # Example headers
     expected_num_columns = len(expected_headers)
     with open(file_path, mode='r', encoding='utf-8') as csvfile:

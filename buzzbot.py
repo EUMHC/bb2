@@ -7,7 +7,8 @@ from itertools import groupby
 from operator import attrgetter
 
 from DistanceMatrixAPI import DistanceMatrixInterface, LocationManager
-from buzzbot_constants import get_DistanceMatrix_credentials
+from buzzbot_constants import buzzbotConfiguration
+from heuristics import SelectionFunction
 
 # Configuring logger
 logger = logging.getLogger("TheBuzzBot Logger")
@@ -61,15 +62,16 @@ class Fixture:
 
 
 class BuzzBot:
-    def __init__(self, matches_, teams_, umpiring_count_):
+    def __init__(self, matches_: [Fixture], teams_: [str], umpiring_count_: dict, criteria_: SelectionFunction):
         self.matches: [Fixture] = matches_
         self.teams: [str] = teams_
         self.umpiring_count: dict = umpiring_count_
         self.location_manager: LocationManager = LocationManager()
-        self.api: DistanceMatrixInterface = DistanceMatrixInterface(get_DistanceMatrix_credentials())
+        self.api: DistanceMatrixInterface = DistanceMatrixInterface(buzzbotConfiguration.settings['distance_matrix_ai'])
         self.bootstrap_api()
         self.travel_time_table: dict = self.api.get_travel_time_table()
         self.assignments: dict = {}
+        self.selection_criteria: SelectionFunction = criteria_
 
     def extract_location_names(self) -> [str]:
         return [m.location for m in self.matches]
@@ -164,8 +166,10 @@ class BuzzBot:
         match.eligible_teams = eligible_teams
         if not eligible_teams:
             return "No available umpire"
+
+        best_team = self.selection_criteria.evaluate(eligible_teams, umpiring_count=self.umpiring_count)
         # Greedy heuristic that takes the team with the least assignments first, then the strongest team.
-        return sorted(eligible_teams, key=lambda x: (self.umpiring_count[x], x))[0]
+        return  best_team
 
     def get_eligible_teams(self, match: Fixture) -> [str]:
         """
@@ -173,13 +177,14 @@ class BuzzBot:
         :param match: Fixture object representing the match
         :return: List of strings representing the names of eligible teams
         """
-        teams_playing_same_day = self.get_teams_playing_same_day(match)
-        eligible_playing_teams = [team for team in teams_playing_same_day if self.is_eligible(team, match)]
-
-        if eligible_playing_teams:
-            return eligible_playing_teams
-        else:
-            return [team for team in self.teams if team not in teams_playing_same_day and self.is_eligible(team, match)]
+        # teams_playing_same_day = self.get_teams_playing_same_day(match)
+        # eligible_playing_teams = [team for team in teams_playing_same_day if self.is_eligible(team, match)]
+        #
+        # if eligible_playing_teams:
+        #     return eligible_playing_teams
+        # else:
+        #     return [team for team in self.teams if team not in teams_playing_same_day and self.is_eligible(team, match)]
+        return [team for team in self.teams if self.is_eligible(team, match)]
 
     def get_teams_playing_same_day(self, match: Fixture) -> [str]:
         """

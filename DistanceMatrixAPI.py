@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 import requests
 import json
-from buzzbot_constants import get_DistanceMatrix_credentials
+from buzzbot_constants import buzzbotConfiguration
 
 
 class DistanceMatrixLocation:

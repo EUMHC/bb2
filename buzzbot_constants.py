@@ -1,21 +1,45 @@
 import random
-
 import yaml
 
-with open('configuration.yaml', 'r') as file:
-    config = yaml.safe_load(file)
+from heuristics import SelectionFunction, GreedyFair
+class BuzzBotConfiguration:
+
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(BuzzBotConfiguration, cls).__new__(cls)
+            cls._instance.__initialized = False
+        return cls._instance
+
+    def __init__(self, config_file='configuration.yaml'):
+        if self.__initialized:
+            return
+        self.__initialized = True
+        self.config_file = config_file
+        self.load()
+        self.validate_file()
+    def load(self):
+        try:
+            with open(self.config_file, 'r') as file:
+                self.settings = yaml.safe_load(file) or {}
+        except FileNotFoundError:
+            # TODO - make these the default settings, not an empty dictionary.
+            self.settings = {}
 
 
-def get_uni_teams() -> [str]:
-    return config['configuration']['teams']
+    def validate_file(self):
+        if len(self.settings['distance_matrix_ai']['api_key']) < 20:
+            raise ValueError("DistanceMatrix API not recognised as correct format")
+
+    def save(self):
+        with open(self.config_file, 'w') as file:
+            yaml.safe_dump(self.settings, file)
 
 
-def get_DistanceMatrix_credentials():
-    api_key = config['configuration']['distance_matrix_ai']['api_key']
-    return api_key
+# Singleton instantiation
+buzzbotConfiguration = BuzzBotConfiguration("configuration.yaml")
 
 
-def get_taglines():
-    taglines = config['configuration']['taglines']
-    random.shuffle(taglines)
-    return taglines
+def get_selection_criteria() -> SelectionFunction:
+    return GreedyFair()
