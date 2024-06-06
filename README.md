@@ -28,6 +28,44 @@ constraints.
 - The travel time A -> B is equal to B -> A
 - Umpires travel to and from games in cars
 
+
+
+## Prerequisites
+
+Make sure you have the following installed on your system:
+
+- Python (>=3.6)
+- pip (Python package installer)
+- Virtualenv (optional but recommended)
+
+## Installation
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/CallumAlexander/The-BuzzBot-Python.git
+cd The-BuzzBot-Python
+```
+
+### Install Dependencies
+
+Install the required Python packages using pip:
+
+```bash
+pip install -r requirements.txt
+```
+
+
+## Running the Application
+
+To start the Flask application, use the following command:
+
+```bash
+flask run
+```
+
+By default, the application will run on `http://127.0.0.1:5000/`. Navigate to there in your browser.
+
 ## To-do list of things to do
 - [x] Prioritised covering selection for teams playing on the same day
 - [x] Doesn't select the playing team as the covering team
