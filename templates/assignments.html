@@ -22,48 +22,57 @@
         </div>
     </div>
 
-    <div class="upload-container">
-        <h2>Upload Fixtures CSV File</h2>
-        <form action="{{ url_for('upload_and_process_file') }}" method="post" enctype="multipart/form-data"
-              class="file-input" id="uploadForm">
-            <input type="file" name="file" value="Browse for file..." id="file" onchange="updateFileName()">
-            <label for="file"></label>
-            <input type="submit" value="Assign umpires" class="upload-btn">
-        </form>
-        <div class="file-name" id="fileName"></div>
+    <h1>Upload File or Enter Data</h1>
+
+    <div class="tab">
+        <button class="tablinks" onclick="openTab(event, 'UploadForm')">Upload CSV</button>
+        <button class="tablinks" onclick="openTab(event, 'InputForm')">Manual Input</button>
     </div>
 
-    <h2>Or</h2>
+    <div id="UploadForm" class="tab-content">
+        <div class="upload-container">
+            <h2>Upload Fixtures CSV File</h2>
+            <form action="{{ url_for('upload_and_process_file') }}" method="post" enctype="multipart/form-data"
+                  class="file-input" id="uploadForm">
+                <input type="file" name="file" value="Browse for file..." id="file" onchange="updateFileName()">
+                <label for="file"></label>
+                <input type="submit" value="Assign umpires" class="upload-btn">
+            </form>
+            <div class="file-name" id="fileName"></div>
+        </div>
+    </div>
 
-    <form action="{{ url_for('upload_and_process_file') }}" method="post">
-        <table id="inputTable">
-            <tr>
-                <th>Unay Team</th>
-                <th>Opposition</th>
-                <th>Location</th>
-                <th>Time</th>
-                <th>Umpires required</th>
-            </tr>
-            <tr>
-                <td>
-                    <select name="uni_team[]">
-                    </select>
-                </td>
-                <td><input type="text" name="opposition[]"></td>
-                <td>
-                    <select name="location[]">
-                    </select>
-                </td>
-                <td><input type="time" name="time[]"></td>
-                <td>
-                    <select name="umpires[]">
-                    </select>
-                </td>
-            </tr>
-        </table>
-        <button type="button" onclick="addRow()">Add Row</button>
-        <button type="submit">Submit</button>
-    </form>
+    <div id="InputForm" class="tab-content">
+        <form action="{{ url_for('upload_and_process_file') }}" method="post" class="input-table">
+            <table id="inputTable">
+                <tr>
+                    <th>Uni Team</th>
+                    <th>Opposition</th>
+                    <th>Location</th>
+                    <th>Time</th>
+                    <th>Umpires required</th>
+                </tr>
+                <tr>
+                    <td>
+                        <select name="uni_team[]">
+                        </select>
+                    </td>
+                    <td><input type="text" name="opposition[]"></td>
+                    <td>
+                        <select name="location[]">
+                        </select>
+                    </td>
+                    <td><input type="time" name="time[]"></td>
+                    <td>
+                        <select name="umpires[]">
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <button type="button" onclick="addRow()">Add Row</button>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
 
     <div id="notification-banner-container"></div>
 
@@ -205,12 +214,12 @@
 
         // Function to create and display the notification banner
         function createBanner(noUmpireElement) {
-            // Check if the banner already exists
+
             if (document.querySelector('.notification-banner')) return;
 
             var date = noUmpireElement.getAttribute('data-date');
 
-            // Create the banner
+
             var banner = document.createElement('div');
             banner.className = 'notification-banner';
             banner.innerHTML = `
@@ -218,15 +227,15 @@
                 <button class="close-banner">X</button>
             `;
 
-            // Append the banner to the container
+
             bannerContainer.appendChild(banner);
 
-            // Show the banner with animation
+
             setTimeout(() => {
                 banner.classList.add('show');
             }, 100); // Small delay to trigger CSS animation
 
-            // Add event listener to close the banner
+
             banner.querySelector('.close-banner').addEventListener('click', function () {
                 banner.classList.remove('show');
                 banner.classList.add('hide');
@@ -235,14 +244,14 @@
                 }, 500); // Match the transition duration
             });
 
-            // Smooth scroll to the date section when the link is clicked
+
             banner.querySelector('a').addEventListener('click', function (event) {
                 event.preventDefault();
                 document.getElementById(this.getAttribute('href').substring(1)).scrollIntoView({ behavior: 'smooth' });
             });
         }
 
-        // MutationObserver to watch for changes in the DOM
+
         var observer = new MutationObserver(function (mutations) {
             mutations.forEach(function (mutation) {
                 if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
@@ -255,10 +264,10 @@
             });
         });
 
-        // Start observing the entire document for added nodes
+
         observer.observe(document.body, { childList: true, subtree: true });
 
-        // Initial check in case the element is already in the DOM
+
         var initialElement = document.querySelector('.no-umpire-count-value');
         if (initialElement) {
             createBanner(initialElement);
@@ -270,7 +279,7 @@
     <script>
         function populateSelect(element, options) {
             if (Array.isArray(options)) {
-                element.innerHTML = ''; // Clear existing options
+                element.innerHTML = '';
                 options.forEach(option => {
                     let optionElement = document.createElement("option");
                     optionElement.value = option;
@@ -318,7 +327,7 @@
         }
 
         document.addEventListener("DOMContentLoaded", function() {
-            // Populate the initial row
+            // Populate the in
             const initialUniTeamSelect = document.querySelector("select[name='uni_team[]']");
             const initialLocationSelect = document.querySelector("select[name='location[]']");
             const initialUmpireSelect = document.querySelector("select[name='umpires[]']");
@@ -331,6 +340,27 @@
 
         let teams = {{config.settings['teams'] | tojson | safe}};
         let locs = {{locs.keys() | list | tojson | safe }};
+    </script>
+
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById("UploadForm").style.display = "block"; // Show the default tab
+            document.querySelector(".tablinks").classList.add("active"); // Activate the default tab
+        });
     </script>
 
 {% endblock %}

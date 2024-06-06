@@ -43,7 +43,6 @@ def upload_and_process_file():
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(filepath)
 
-                # Custom code based on your provided snippet
                 teams = buzzbotConfiguration.settings['teams']
                 matches = buzzbot.load_fixtures_from_csv(filepath)
                 umpiring_count = {team: 0 for team in teams}
