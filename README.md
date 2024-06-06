@@ -16,6 +16,8 @@ system
 presented, called The BuzzBot, successfully assigns 'covering teams' to fixtures based on set assumptions and
 constraints.
 
+## Constraints, Heuristics, and Assumptions
+
 ### Heuristic: Team Ranking and Umpiring Ability
 The higher the team, the better the umpiring ability. If team $t_1$ is ranked higher than team $t_2$, then the umpiring ability of $t_1$ is greater than the umpiring ability of $t_2$.
 
