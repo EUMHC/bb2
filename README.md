@@ -16,43 +16,46 @@ system
 presented, called The BuzzBot, successfully assigns 'covering teams' to fixtures based on set assumptions and
 constraints.
 
-### Constraints, Heuristics, and Assumptions
+### Heuristic: Team Ranking and Umpiring Ability
+The higher the team, the better the umpiring ability. If team $t_1$ is ranked higher than team $t_2$, then the umpiring ability of $t_1$ is greater than the umpiring ability of $t_2$.
 
-#### Mathematical Notation
+$$
+t_1 > t_2 \implies \text{UmpireAbility}(t_1) > \text{UmpireAbility}(t_2)
+$$
 
-Let:
-- \( T_{AB} \) be the travel time between fixtures \( A \) and \( B \).
-- \( A.\text{start} \) and \( A.\text{end} \) be the start and end times of fixture \( A \).
-- \( \text{players}(g) \) be the set of players in game \( g \).
-- \( \text{UmpireAbility}(t) \) be the umpiring ability of team \( t \).
+### Constraint: Umpire Cannot Play and Umpire Simultaneously
+An umpire $u$ cannot umpire and play at the same time.
 
+$$
+u \text{ umpires game } g \implies u \notin \text{players}(g)
+$$
 
-1. **Heuristic: Team Ranking and Umpiring Ability**
-   - The higher the team, the better the umpiring ability.
-   - If team \( t_1 \) is ranked higher than team \( t_2 \), then \( \text{umpiring ability of } t_1 > \text{umpiring ability of } t_2 \).
-   - Formally: \( t_1 > t_2 \implies \text{UmpireAbility}(t_1) > \text{UmpireAbility}(t_2) \)
+### Constraint: Fixture Overlap
+An umpire cannot umpire a fixture if the fixture overlaps with their own playing fixture. For fixtures $A$ and $B$ in the list of fixtures $F$:
 
-2. **Constraint: Umpire Cannot Play and Umpire Simultaneously**
-   - An umpire \( u \) cannot umpire and play at the same time:
-   - \( u \text{ umpires game } g \implies u \not\in \text{players}(g) \)
+$$
+\neg (A_{\text{start}} < B_{\text{end}} \land A_{\text{end}} > B_{\text{start}})
+$$
 
-3. **Constraint: Fixture Overlap**
-   - An umpire cannot umpire a fixture if the fixture overlaps with their own playing fixture.
-   - For fixtures \( A \) and \( B \) in the list of fixtures \( F \):
-   - \( \neg (A.\text{start} < B.\text{end} \land A.\text{end} > B.\text{start}) \)
+### Constraint: Travel Time Between Fixtures
+An umpire cannot umpire a fixture if the time between the umpiring fixture and the playing fixture is less than the total travel time between the two. Let $T_{AB}$ be the travel time between fixtures $A$ and $B$:
 
-4. **Constraint: Travel Time Between Fixtures**
-   - An umpire cannot umpire a fixture if the time between the umpiring fixture and the playing fixture is less than the total travel time between the two.
-   - Let \( T_{AB} \) be the travel time between fixtures \( A \) and \( B \):
-   - \( A.\text{end} + T_{AB} \leq B.\text{start} \) and \( B.\text{end} + T_{BA} \leq A.\text{start} \)
+$$
+A_{\text{end}} + T_{AB} \leq B_{\text{start}}
+$$
+$$
+B_{\text{end}} + T_{BA} \leq A_{\text{start}}
+$$
 
-5. **Assumption: Symmetric Travel Time**
-   - The travel time from fixture \( A \) to fixture \( B \) is equal to the travel time from fixture \( B \) to fixture \( A \).
-   - Formally: \( T_{AB} = T_{BA} \)
+### Assumption: Symmetric Travel Time
+The travel time from fixture $A$ to fixture $B$ is equal to the travel time from fixture $B$ to fixture $A$.
 
-6. **Assumption: Mode of Travel**
-   - Umpires travel to and from games in cars.
+$$
+T_{AB} = T_{BA}
+$$
 
+### Assumption: Mode of Travel
+Umpires travel to and from games in cars.
 
 
 
