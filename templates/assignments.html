@@ -33,6 +33,38 @@
         <div class="file-name" id="fileName"></div>
     </div>
 
+    <h2>Or</h2>
+
+    <form action="{{ url_for('upload_and_process_file') }}" method="post">
+        <table id="inputTable">
+            <tr>
+                <th>Unay Team</th>
+                <th>Opposition</th>
+                <th>Location</th>
+                <th>Time</th>
+                <th>Umpires required</th>
+            </tr>
+            <tr>
+                <td>
+                    <select name="uni_team[]">
+                    </select>
+                </td>
+                <td><input type="text" name="opposition[]"></td>
+                <td>
+                    <select name="location[]">
+                    </select>
+                </td>
+                <td><input type="time" name="time[]"></td>
+                <td>
+                    <select name="umpires[]">
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <button type="button" onclick="addRow()">Add Row</button>
+        <button type="submit">Submit</button>
+    </form>
+
     <div id="notification-banner-container"></div>
 
     {% for date, games in games_by_date.items() %}
@@ -54,7 +86,7 @@
                 <p class="pale-orange">{{ (games | length) - home_count }} away games</p>
 
                 {% if no_umpire_count > 0 %}
-                    <p class="no-umpire-count-value no-umpire-red" data-date="{{ date.strftime('%A, %d %B, %Y') }}" style="color: white;">{{ no_umpire_count }} games not covered</p>
+                    <p class="no-umpire-count-value no-umpire-red" data-date="{{ date.strftime('%A, %d %B, %Y') }}" style="color: white;">&#x274C; {{ no_umpire_count }} games not covered</p>
                 {% else %}
                     <p class="all-good pale-green">&#x2705; All matches can be covered</p>
                 {% endif %}
@@ -182,7 +214,7 @@
             var banner = document.createElement('div');
             banner.className = 'notification-banner';
             banner.innerHTML = `
-                <p>&#x203C; ${noUmpireElement.textContent} on ${date}. <a href="#${noUmpireElement.closest('.date-section').querySelector('.date-header').id}">Jump to date</a></p>
+                <p>${noUmpireElement.textContent} on ${date}. <a href="#${noUmpireElement.closest('.date-section').querySelector('.date-header').id}">Jump to date</a></p>
                 <button class="close-banner">X</button>
             `;
 
@@ -233,8 +265,72 @@
         }
     });
 
+    </script>
 
+    <script>
+        function populateSelect(element, options) {
+            if (Array.isArray(options)) {
+                element.innerHTML = ''; // Clear existing options
+                options.forEach(option => {
+                    let optionElement = document.createElement("option");
+                    optionElement.value = option;
+                    optionElement.text = option;
+                    element.appendChild(optionElement);
+                });
+            } else {
+                console.error('Options provided are not an array:', options);
+            }
+        }
 
+        function addRow() {
+            const table = document.getElementById("inputTable");
+            const row = table.insertRow(-1); // Insert at the end of the table
+
+            const cell1 = row.insertCell(0);
+            const uniTeamSelect = document.createElement("select");
+            uniTeamSelect.name = "uni_team[]";
+            populateSelect(uniTeamSelect, teams);
+            cell1.appendChild(uniTeamSelect);
+
+            const cell2 = row.insertCell(1);
+            const oppositionInput = document.createElement("input");
+            oppositionInput.type = "text";
+            oppositionInput.name = "opposition[]";
+            cell2.appendChild(oppositionInput);
+
+            const cell3 = row.insertCell(2);
+            const locationSelect = document.createElement("select");
+            locationSelect.name = "location[]";
+            populateSelect(locationSelect, locs);
+            cell3.appendChild(locationSelect);
+
+            const cell4 = row.insertCell(3);
+            const timeInput = document.createElement("input");
+            timeInput.type = "time";
+            timeInput.name = "time[]";
+            cell4.appendChild(timeInput);
+
+            const cell5 = row.insertCell(4);
+            const umpireSelect = document.createElement("select");
+            umpireSelect.name = "umpires[]";
+            populateSelect(umpireSelect, [0, 1, 2]);
+            cell5.appendChild(umpireSelect);
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // Populate the initial row
+            const initialUniTeamSelect = document.querySelector("select[name='uni_team[]']");
+            const initialLocationSelect = document.querySelector("select[name='location[]']");
+            const initialUmpireSelect = document.querySelector("select[name='umpires[]']");
+            if (initialUniTeamSelect && initialLocationSelect && initialUmpireSelect) {
+                populateSelect(initialUniTeamSelect, teams);
+                populateSelect(initialLocationSelect, locs);
+                populateSelect(initialUmpireSelect, [0, 1, 2]);
+            }
+        });
+
+        let teams = {{config.settings['teams'] | tojson | safe}};
+        let locs = {{locs.keys() | list | tojson | safe }};
     </script>
 
 {% endblock %}

@@ -20,6 +20,25 @@ fh.setFormatter(formatter)
 logger.addHandler(fh)
 
 
+def load_fixtures_from_html_form(form_dictionary: dict):
+    uni_teams = form_dictionary.getlist('uni_team[]')
+    oppositions = form_dictionary.getlist('opposition[]')
+    locations = form_dictionary.getlist('location[]')
+
+    times = form_dictionary.getlist('time[]')
+    current_date = datetime.datetime.now().date()
+    times = [
+        datetime.datetime.combine(current_date, datetime.datetime.strptime(time, '%H:%M').time())
+        for time in times
+    ]
+
+    umpires_needed_list = form_dictionary.getlist('umpires[]')
+    umpires_needed_list = list(map(lambda x: int(x), umpires_needed_list))
+    matches = []
+    for uni_team, opposition, location, time, umpires_needed  in zip(uni_teams, oppositions, locations, times, umpires_needed_list):
+         matches.append(Fixture(uni_team, opposition, time, umpires_needed, location))
+    return matches
+
 def load_fixtures_from_csv(csv_path):
     matches_ = []
     errors_exist, error_messages = utils.validate_csv_format(csv_path)
@@ -62,6 +81,9 @@ class Fixture:
 
 
 class BuzzBot:
+    """
+    The meat of it all.
+    """
     def __init__(self, matches_: [Fixture], teams_: [str], umpiring_count_: dict, criteria_: SelectionFunction):
         self.matches: [Fixture] = matches_
         self.teams: [str] = teams_

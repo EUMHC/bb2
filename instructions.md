@@ -54,10 +54,11 @@ Hence, the name "Comma-Separated Values". For the purpose of this program, we ju
 3. **Text Format**: CSV files are plain text files, which means they can be opened and edited
 with any text editor, such as Notepad on Windows or TextEdit on Mac (**NOT Micros*ft Word or 
 Apple Pages**). This simplicity makes them very portable and easy to work with. Because they
-represent tabular data, they can be opened by Excel, Apple Numbers, Google Sheets too, but be careful that
-when you are saving them after opening it in these programs that it is still saved as a 
-`.csv` file and not as a `.xls` or `.xlt` or anything else. If you are using a MAC or a Windows computer, your computer
+represent tabular data, they can be opened by Excel, Apple Numbers, Google Sheets too. If you are using a MAC or a Windows computer, your computer
 might try to open a `.csv` file in Excel or Numbers. I am not sure about Numbers, but Excel will do it automatically.
+
+> **Note:**
+> Be careful that when you are saving them after opening it in these programs that it is still saved as a `.csv` file and not as a `.xls` or `.xlt` or anything else. 
 
 4. **Common Usage**: CSV files are widely used for various purposes, such as exporting data 
 from databases, exchanging data between different programs or systems, and performing data 

@@ -9,7 +9,6 @@ from difflib import SequenceMatcher
 from buzzbot_constants import buzzbotConfiguration
 
 import DistanceMatrixAPI
-import buzzbot_constants
 
 
 class ExceptionWithList(Exception):
@@ -33,7 +32,7 @@ def print_ascii_header():
   \_/ |_| |_|\___| \____/ \__,_/___/___\____/ \___/ \__|
 A program by Callum Alexander (thecatthatbarks)
 
-`If the EUHC Cinematic Universe allowed myself, Jack Mead, and Ed Bury to do the umpiring assignments 
+`If the EUHC Cinematic Universe allowed Jack Mead, Ed Bury, and I to do the umpiring assignments 
 for EUMHC together at the same time. Then times that by 10 million.`
                                                       
 '''

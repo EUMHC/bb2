@@ -31,26 +31,39 @@ def allowed_file(filename):
 def upload_and_process_file():
     games_by_date = {}
     taglines = buzzbotConfiguration.settings['taglines']
+    lm = DistanceMatrixAPI.LocationManager()
+    print(request.form)
 
     if request.method == 'POST':
-        if 'file' not in request.files:
-            return redirect(request.url)
+        if 'file' in request.files and request.files['file'].filename != '':
+            file = request.files['file']
 
-        file = request.files['file']
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(filepath)
 
-        if file.filename == '':
-            return redirect(request.url)
+                # Custom code based on your provided snippet
+                teams = buzzbotConfiguration.settings['teams']
+                matches = buzzbot.load_fixtures_from_csv(filepath)
+                umpiring_count = {team: 0 for team in teams}
 
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(filepath)
+                selection_criteria = buzzbot_constants.get_selection_criteria()
+                bot = buzzbot.BuzzBot(matches, teams, umpiring_count, criteria_=selection_criteria)
+                bot.assign_covering_teams(print_results=False)
 
-            # Custom code based on your provided snippet
+                games = bot.matches
+                games.sort(key=lambda x: x.start_time)
+                games_by_date = {date: list(games) for date, games in groupby(games, key=lambda x: x.start_time.date())}
+                taglines = utils.taglines
+
+
+        elif 'uni_team[]' in request.form and 'opposition[]' in request.form and 'location[]' in request.form and 'time[]' in request.form:
+
+            matches = buzzbot.load_fixtures_from_html_form(request.form)
+
             teams = buzzbotConfiguration.settings['teams']
-            matches = buzzbot.load_fixtures_from_csv(filepath)
             umpiring_count = {team: 0 for team in teams}
-
             selection_criteria = buzzbot_constants.get_selection_criteria()
             bot = buzzbot.BuzzBot(matches, teams, umpiring_count, criteria_=selection_criteria)
             bot.assign_covering_teams(print_results=False)
@@ -60,7 +73,7 @@ def upload_and_process_file():
             games_by_date = {date: list(games) for date, games in groupby(games, key=lambda x: x.start_time.date())}
             taglines = utils.taglines
 
-    return render_template('assignments.html', games_by_date=games_by_date, taglines=taglines, config=buzzbotConfiguration)
+    return render_template('assignments.html', games_by_date=games_by_date, taglines=taglines, config=buzzbotConfiguration, locs=lm.get_all_locations())
 
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
