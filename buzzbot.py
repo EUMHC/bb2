@@ -36,7 +36,8 @@ def load_fixtures_from_html_form(form_dictionary: dict):
     umpires_needed_list = list(map(lambda x: int(x), umpires_needed_list))
     matches = []
     for uni_team, opposition, location, time, umpires_needed  in zip(uni_teams, oppositions, locations, times, umpires_needed_list):
-         matches.append(Fixture(uni_team, opposition, time, umpires_needed, location))
+        if opposition == "": opposition = "Opposition name not given"
+        matches.append(Fixture(uni_team, opposition, time, umpires_needed, location))
     return matches
 
 def load_fixtures_from_csv(csv_path):

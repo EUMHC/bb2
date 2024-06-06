@@ -42,35 +42,23 @@ def upload_and_process_file():
                 filename = secure_filename(file.filename)
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(filepath)
-
-                teams = buzzbotConfiguration.settings['teams']
                 matches = buzzbot.load_fixtures_from_csv(filepath)
-                umpiring_count = {team: 0 for team in teams}
-
-                selection_criteria = buzzbot_constants.get_selection_criteria()
-                bot = buzzbot.BuzzBot(matches, teams, umpiring_count, criteria_=selection_criteria)
-                bot.assign_covering_teams(print_results=False)
-
-                games = bot.matches
-                games.sort(key=lambda x: x.start_time)
-                games_by_date = {date: list(games) for date, games in groupby(games, key=lambda x: x.start_time.date())}
-                taglines = utils.taglines
 
 
         elif 'uni_team[]' in request.form and 'opposition[]' in request.form and 'location[]' in request.form and 'time[]' in request.form:
-
             matches = buzzbot.load_fixtures_from_html_form(request.form)
 
-            teams = buzzbotConfiguration.settings['teams']
-            umpiring_count = {team: 0 for team in teams}
-            selection_criteria = buzzbot_constants.get_selection_criteria()
-            bot = buzzbot.BuzzBot(matches, teams, umpiring_count, criteria_=selection_criteria)
-            bot.assign_covering_teams(print_results=False)
 
-            games = bot.matches
-            games.sort(key=lambda x: x.start_time)
-            games_by_date = {date: list(games) for date, games in groupby(games, key=lambda x: x.start_time.date())}
-            taglines = utils.taglines
+        teams = buzzbotConfiguration.settings['teams']
+        umpiring_count = {team: 0 for team in teams}
+        selection_criteria = buzzbot_constants.get_selection_criteria()
+        bot = buzzbot.BuzzBot(matches, teams, umpiring_count, criteria_=selection_criteria)
+        bot.assign_covering_teams(print_results=False)
+
+        games = bot.matches
+        games.sort(key=lambda x: x.start_time)
+        games_by_date = {date: list(games) for date, games in groupby(games, key=lambda x: x.start_time.date())}
+        taglines = utils.taglines
 
     return render_template('assignments.html', games_by_date=games_by_date, taglines=taglines, config=buzzbotConfiguration, locs=lm.get_all_locations())
 

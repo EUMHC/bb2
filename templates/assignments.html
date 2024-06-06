@@ -36,7 +36,7 @@
                   class="file-input" id="uploadForm">
                 <input type="file" name="file" value="Browse for file..." id="file" onchange="updateFileName()">
                 <label for="file"></label>
-                <input type="submit" value="Assign umpires" class="upload-btn">
+                <input type="submit" value="Assign umpires"class="upload-btn" id="submitBtn" disabled>
             </form>
             <div class="file-name" id="fileName"></div>
         </div>
@@ -67,10 +67,11 @@
                         <select name="umpires[]">
                         </select>
                     </td>
+                    <td><button type="button" onclick="removeRow(this)">Remove</button></td>
                 </tr>
             </table>
-            <button type="button" onclick="addRow()">Add Row</button>
-            <button type="submit">Submit</button>
+            <button type="button" onclick="addRow()">Add Fixture</button>
+            <button type="submit">Submit & Assign</button>
         </form>
     </div>
 
@@ -189,10 +190,25 @@
 {% block scripts %}
 
     <script>
+        document.getElementById('file').addEventListener('change', function() {
+            const fileInput = document.getElementById('file');
+            const submitBtn = document.getElementById('submitBtn');
+            if (fileInput.files.length > 0) {
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.disabled = true;
+            }
+            updateFileName();
+        });
+
         function updateFileName() {
-            var input = document.getElementById('file');
-            var fileName = document.getElementById('fileName');
-            fileName.innerHTML = input.files[0].name;
+            const fileInput = document.getElementById('file');
+            const fileNameDiv = document.getElementById('fileName');
+            if (fileInput.files.length > 0) {
+                fileNameDiv.textContent = `Selected file: ${fileInput.files[0].name}`;
+            } else {
+                fileNameDiv.textContent = '';
+            }
         }
     </script>
 
@@ -212,67 +228,85 @@
         document.addEventListener('DOMContentLoaded', function () {
         var bannerContainer = document.getElementById('notification-banner-container');
 
-        // Function to create and display the notification banner
-        function createBanner(noUmpireElement) {
+        // Function to create or update the notification banner
+        function updateBanner() {
+            // Find all elements with class 'no-umpire-count-value'
+            var noUmpireElements = document.querySelectorAll('.no-umpire-count-value');
 
-            if (document.querySelector('.notification-banner')) return;
+            // If no elements found, remove existing banner and return
+            if (noUmpireElements.length === 0) {
+                var existingBanner = document.querySelector('.notification-banner');
+                if (existingBanner) {
+                    existingBanner.classList.remove('show');
+                    existingBanner.classList.add('hide');
+                    setTimeout(() => {
+                        existingBanner.remove();
+                    }, 500); // Match the transition duration
+                }
+                return;
+            }
 
-            var date = noUmpireElement.getAttribute('data-date');
+            // Aggregate all occurrences
+            var occurrences = Array.from(noUmpireElements).map(function (el) {
+                var date = el.getAttribute('data-date');
+                var id = el.closest('.date-section').querySelector('.date-header').id;
+                return `${el.textContent} on ${date}. <a href="#${id}">Jump to date</a>`;
+            }).join('<br>');
 
+            // Create or update the banner
+            var banner = document.querySelector('.notification-banner');
+            if (!banner) {
+                banner = document.createElement('div');
+                banner.className = 'notification-banner';
+                bannerContainer.appendChild(banner);
+            }
 
-            var banner = document.createElement('div');
-            banner.className = 'notification-banner';
             banner.innerHTML = `
-                <p>${noUmpireElement.textContent} on ${date}. <a href="#${noUmpireElement.closest('.date-section').querySelector('.date-header').id}">Jump to date</a></p>
+                <p>${occurrences}</p>
                 <button class="close-banner">X</button>
             `;
 
-
-            bannerContainer.appendChild(banner);
-
-
+            // Show the banner with a small delay to trigger CSS animation
             setTimeout(() => {
                 banner.classList.add('show');
-            }, 100); // Small delay to trigger CSS animation
+            }, 100);
 
-
+            // Add event listener for closing the banner
             banner.querySelector('.close-banner').addEventListener('click', function () {
                 banner.classList.remove('show');
                 banner.classList.add('hide');
                 setTimeout(() => {
-                    banner.style.display = 'none';
+                    banner.remove();
                 }, 500); // Match the transition duration
             });
 
-
-            banner.querySelector('a').addEventListener('click', function (event) {
-                event.preventDefault();
-                document.getElementById(this.getAttribute('href').substring(1)).scrollIntoView({ behavior: 'smooth' });
+            // Add event listeners for the links
+            banner.querySelectorAll('a').forEach(function (link) {
+                link.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    document.getElementById(this.getAttribute('href').substring(1)).scrollIntoView({ behavior: 'smooth' });
+                });
             });
         }
 
-
+        // Observer to detect added elements
         var observer = new MutationObserver(function (mutations) {
             mutations.forEach(function (mutation) {
                 if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
                     mutation.addedNodes.forEach(function (node) {
                         if (node.nodeType === Node.ELEMENT_NODE && node.classList.contains('no-umpire-count-value')) {
-                            createBanner(node);
+                            updateBanner();
                         }
                     });
                 }
             });
         });
 
-
         observer.observe(document.body, { childList: true, subtree: true });
 
-
-        var initialElement = document.querySelector('.no-umpire-count-value');
-        if (initialElement) {
-            createBanner(initialElement);
-        }
-    });
+        // Initial check for existing elements
+        updateBanner();
+        });
 
     </script>
 
@@ -317,6 +351,7 @@
             const timeInput = document.createElement("input");
             timeInput.type = "time";
             timeInput.name = "time[]";
+            timeInput.value = "12:00";
             cell4.appendChild(timeInput);
 
             const cell5 = row.insertCell(4);
@@ -324,18 +359,49 @@
             umpireSelect.name = "umpires[]";
             populateSelect(umpireSelect, [0, 1, 2]);
             cell5.appendChild(umpireSelect);
+
+            const cell6 = row.insertCell(5);
+            const removeButton = document.createElement("button");
+            removeButton.type = "button";
+            removeButton.textContent = "Remove";
+            removeButton.onclick = function() {
+                removeRow(this);
+            };
+            cell6.appendChild(removeButton);
+
+            updateRemoveButtons();
+        }
+
+        function removeRow(button) {
+            const table = document.getElementById("inputTable");
+            if (table.rows.length > 2) { // Ensure at least one row remains
+                const row = button.parentNode.parentNode;
+                table.deleteRow(row.rowIndex);
+            }
+            updateRemoveButtons();
+        }
+
+        function updateRemoveButtons() {
+            const table = document.getElementById("inputTable");
+            const rows = table.getElementsByTagName("tr");
+            for (let i = 1; i < rows.length; i++) {
+                const removeButton = rows[i].getElementsByTagName("button")[0];
+                removeButton.disabled = (rows.length <= 2); // Disable if only one row left
+            }
         }
 
         document.addEventListener("DOMContentLoaded", function() {
-            // Populate the in
             const initialUniTeamSelect = document.querySelector("select[name='uni_team[]']");
             const initialLocationSelect = document.querySelector("select[name='location[]']");
             const initialUmpireSelect = document.querySelector("select[name='umpires[]']");
-            if (initialUniTeamSelect && initialLocationSelect && initialUmpireSelect) {
+            const initialTimeInput = document.querySelector("input[name='time[]']");
+            if (initialUniTeamSelect && initialLocationSelect && initialUmpireSelect && initialTimeInput) {
                 populateSelect(initialUniTeamSelect, teams);
                 populateSelect(initialLocationSelect, locs);
                 populateSelect(initialUmpireSelect, [0, 1, 2]);
+                initialTimeInput.value = "12:00";
             }
+            updateRemoveButtons(); // Initial call to set the button state correctly
         });
 
         let teams = {{config.settings['teams'] | tojson | safe}};
