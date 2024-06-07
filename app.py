@@ -1,9 +1,5 @@
-import random
-import time
-import re
 import os
 from itertools import groupby
-from operator import attrgetter
 
 from flask import Flask, render_template, url_for, request, redirect
 from werkzeug.utils import secure_filename
@@ -66,12 +62,18 @@ def upload_and_process_file():
 def settings():
     if request.method == 'POST':
         data = request.json
+        # API Key
         buzzbotConfiguration.settings['distance_matrix_ai']['api_key'] = data['dm_ai_api_key']
 
+        # Taglines
         taglines_input = data['taglines_input']
         taglines_array = taglines_input.splitlines()
-
         buzzbotConfiguration.settings['taglines'] = taglines_array
+
+        # Teams
+        teams_input = data['teams_input']
+        teams_array = teams_input.splitlines()
+        buzzbotConfiguration.settings['teams'] = teams_array
 
         buzzbotConfiguration.save()
         return redirect(url_for('settings'))
@@ -83,6 +85,10 @@ def locations():
     lm = DistanceMatrixAPI.LocationManager()
     return render_template('locations.html', config=buzzbotConfiguration, locs=lm.get_all_locations())
 
+@app.route('/about')
+def about():
+    return render_template('about.html', config=buzzbotConfiguration)
+
 
 @app.errorhandler(Exception)
 def handle_exception(e):
@@ -91,7 +97,7 @@ def handle_exception(e):
         error_messages = e.messages
     else:
         error_messages.append(str(e))
-    return render_template('error.html', error_messages=error_messages), 500
+    return render_template('error.html', error_messages=error_messages, config=buzzbotConfiguration), 500
 
 
 def open_browser():

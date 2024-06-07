@@ -88,7 +88,7 @@ def validate_csv_format(file_path):
         if headers != expected_headers:
             errors_exist = True
             errors.append(f"Your column names in your input file are incorrect. The program got {headers} from you "
-                          f"but expect {expected_headers}. Please go into the file and change the column names")
+                          f"but expect {expected_headers}. Please go into the file and change the column names.")
 
         for row_number, row in enumerate(reader, start=2):  # Starting from 2 because header is row 1
             if len(row) != expected_num_columns:

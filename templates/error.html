@@ -1,18 +1,15 @@
-<!-- error.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Error</title>
-    <link rel="stylesheet" type="text/css" href="static/css/style.css">
+{% extends "base.html" %}
 
+{% block style %}
     <style>
         body {
             padding-left: 5%;
         }
     </style>
-</head>
-<body>
+{% endblock %}
+
+{% block content %}
+
 <h1>An Error Occurred</h1>
 
 <p><b>Hello user, somewhere along the line, you have been a complete spoon and not followed the instructions correctly
@@ -38,5 +35,5 @@
 
 <h3>Please return to <code>input.csv</code> and correct your mistakes</h3>
 <a href="/">Click here to retry</a>
-</body>
-</html>
+
+{% endblock %}
