@@ -43,37 +43,38 @@
     </div>
 
     <div id="InputForm" class="tab-content">
-        <form action="{{ url_for('upload_and_process_file') }}" method="post" class="input-table">
-            <table id="inputTable">
-                <tr>
-                    <th>Uni Team</th>
-                    <th>Opposition</th>
-                    <th>Location</th>
-                    <th>Time</th>
-                    <th>Umpires required</th>
-                </tr>
-                <tr>
-                    <td>
-                        <select name="uni_team[]">
-                        </select>
-                    </td>
-                    <td><input type="text" name="opposition[]"></td>
-                    <td>
-                        <select name="location[]">
-                        </select>
-                    </td>
-                    <td><input type="time" name="time[]"></td>
-                    <td>
-                        <select name="umpires[]">
-                        </select>
-                    </td>
-                    <td><button type="button" onclick="removeRow(this)">Remove</button></td>
-                </tr>
-            </table>
-            <button type="button" onclick="addRow()">Add Fixture</button>
-            <button type="submit">Submit & Assign</button>
-        </form>
-    </div>
+    <h3>For quick, single matchday input</h3>
+    <form action="{{ url_for('upload_and_process_file') }}" method="post" class="input-table">
+        <table id="inputTable">
+            <tr>
+                <th>Uni Team</th>
+                <th>Opposition</th>
+                <th>Location</th>
+                <th>Time</th>
+                <th>Umpires required</th>
+            </tr>
+            <tr>
+                <td>
+                    <select name="uni_team[]">
+                    </select>
+                </td>
+                <td><input type="text" name="opposition[]"></td>
+                <td>
+                    <select name="location[]">
+                    </select>
+                </td>
+                <td><input type="time" name="time[]"></td>
+                <td>
+                    <select name="umpires[]">
+                    </select>
+                </td>
+                <td><button type="button" onclick="removeRow(this)">Remove</button></td>
+            </tr>
+        </table>
+        <button type="button" id="addFixtureButton" onclick="addRow()">Add Fixture</button>
+        <button type="submit">Submit & Assign</button>
+    </form>
+</div>
 
     <div id="notification-banner-container"></div>
 
@@ -325,14 +326,26 @@
             }
         }
 
+        function getSelectedTeams() {
+            const selects = document.querySelectorAll("select[name='uni_team[]']");
+            return Array.from(selects).map(select => select.value);
+        }
+
         function addRow() {
+            const selectedTeams = getSelectedTeams();
+            const availableTeams = teams.filter(team => !selectedTeams.includes(team));
+            if (availableTeams.length === 0) {
+                alert("All teams have been selected. No more rows can be added.");
+                return;
+            }
+
             const table = document.getElementById("inputTable");
             const row = table.insertRow(-1); // Insert at the end of the table
 
             const cell1 = row.insertCell(0);
             const uniTeamSelect = document.createElement("select");
             uniTeamSelect.name = "uni_team[]";
-            populateSelect(uniTeamSelect, teams);
+            populateSelect(uniTeamSelect, availableTeams);
             cell1.appendChild(uniTeamSelect);
 
             const cell2 = row.insertCell(1);
@@ -369,6 +382,7 @@
             };
             cell6.appendChild(removeButton);
 
+            updateAddButtonState();
             updateRemoveButtons();
         }
 
@@ -378,7 +392,15 @@
                 const row = button.parentNode.parentNode;
                 table.deleteRow(row.rowIndex);
             }
+            updateAddButtonState();
             updateRemoveButtons();
+        }
+
+        function updateAddButtonState() {
+            const selectedTeams = getSelectedTeams();
+            const availableTeams = teams.filter(team => !selectedTeams.includes(team));
+            const addFixtureButton = document.getElementById("addFixtureButton");
+            addFixtureButton.disabled = availableTeams.length === 0;
         }
 
         function updateRemoveButtons() {
@@ -401,11 +423,12 @@
                 populateSelect(initialUmpireSelect, [0, 1, 2]);
                 initialTimeInput.value = "12:00";
             }
+            updateAddButtonState();
             updateRemoveButtons(); // Initial call to set the button state correctly
         });
 
-        let teams = {{config.settings['teams'] | tojson | safe}};
-        let locs = {{locs.keys() | list | tojson | safe }};
+        let teams = {{ config.settings['teams'] | tojson | safe }};
+        let locs = {{ locs.keys() | list | tojson | safe }};
     </script>
 
     <script>

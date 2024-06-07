@@ -116,6 +116,11 @@ th {
     background-color: #f0f0f0;
 }
 
+#location-table {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
 /* Input form table styling */
 
 .input-table {
