@@ -410,6 +410,19 @@
                 const removeButton = rows[i].getElementsByTagName("button")[0];
                 removeButton.disabled = (rows.length <= 2); // Disable if only one row left
             }
+            updateTeamOptions(); // Update team options for all rows
+        }
+
+        function updateTeamOptions() {
+            const selectedTeams = getSelectedTeams();
+            const availableTeams = teams.filter(team => !selectedTeams.includes(team));
+
+            const selects = document.querySelectorAll("select[name='uni_team[]']");
+            selects.forEach(select => {
+                const currentValue = select.value;
+                populateSelect(select, [...availableTeams, currentValue]);
+                select.value = currentValue;
+            });
         }
 
         document.addEventListener("DOMContentLoaded", function() {
