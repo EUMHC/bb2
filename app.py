@@ -32,7 +32,6 @@ def upload_and_process_file():
     games_by_date = {}
     taglines = buzzbotConfiguration.settings['taglines']
     lm = DistanceMatrixAPI.LocationManager()
-    print(request.form)
 
     if request.method == 'POST':
         if 'file' in request.files and request.files['file'].filename != '':
@@ -62,25 +61,22 @@ def upload_and_process_file():
 
     return render_template('assignments.html', games_by_date=games_by_date, taglines=taglines, config=buzzbotConfiguration, locs=lm.get_all_locations())
 
+
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
-
     if request.method == 'POST':
-        # Save settings
-        buzzbotConfiguration.settings['distance_matrix_ai']['api_key'] = request.form['dm_ai_api_key']
+        data = request.json
+        buzzbotConfiguration.settings['distance_matrix_ai']['api_key'] = data['dm_ai_api_key']
 
-        taglines_input = request.form['taglines_input']
-        taglines_input = taglines_input.replace("[", "")
-        taglines_input = taglines_input.replace("]", "")
-        taglines_array = re.findall(r"'(.*?)'", taglines_input)
+        taglines_input = data['taglines_input']
+        taglines_array = taglines_input.splitlines()
 
         buzzbotConfiguration.settings['taglines'] = taglines_array
 
         buzzbotConfiguration.save()
         return redirect(url_for('settings'))
 
-    return render_template('settings.html',
-                           config=buzzbotConfiguration)
+    return render_template('settings.html', config=buzzbotConfiguration)
 
 @app.route('/locations')
 def locations():

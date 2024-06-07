@@ -3,16 +3,16 @@
 {% block content %}
 
     <h2>Settings</h2>
+<!--    <pre id="currentSettings">{{ config.settings | tojson(indent=2) }}</pre>-->
 
-    <form method="post">
+    <form onsubmit="updateSettings(event);">
         <label for="dm_ai_api_key">DistanceMatrix.AI API Key:</label>
         <input type="password" id="dm_ai_api_key" name="dm_ai_api_key" value="{{ config.settings['distance_matrix_ai']['api_key'] }}">
         <i class="api-key-toggle" id="toggleAPIkey" style="width: 50vw;">Show</i>
         <br><br>
 
-
-        <label for="setting2">Taglines for The BuzzBot to say:</label>
-        <textarea rows="5" cols="80" id="taglines_input" name="taglines_input" value="{{ config.settings['taglines'] }}"></textarea><br><br>
+        <label for="taglines_input">Taglines for The BuzzBot to say:</label>
+        <textarea rows="5" cols="80" id="taglines_input" name="taglines_input">{{ config.settings['taglines'] | join('\n') }}</textarea><br><br>
 
         <input type="submit" value="Save settings">
     </form>
@@ -31,4 +31,44 @@
             toggleButton.textContent = type === 'password' ? 'Show' : 'Hide';
         });
 </script>
+
+<script>
+    async function updateSettings(event) {
+        event.preventDefault();
+        const dmAiApiKey = document.getElementById('dm_ai_api_key').value;
+        const taglinesInput = document.getElementById('taglines_input').value;
+
+        const response = await fetch('/settings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                dm_ai_api_key: dmAiApiKey,
+                taglines_input: taglinesInput
+            }),
+        });
+
+        if (response.redirected) {
+            window.location.href = response.url;
+        }
+    }
+
+    function toggleApiKeyVisibility() {
+        const apiKeyInput = document.getElementById('dm_ai_api_key');
+        const toggleBtn = document.getElementById('toggleAPIkey');
+        if (apiKeyInput.type === 'password') {
+            apiKeyInput.type = 'text';
+            toggleBtn.innerText = 'Hide';
+        } else {
+            apiKeyInput.type = 'password';
+            toggleBtn.innerText = 'Show';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+        document.getElementById('toggleAPIkey').addEventListener('click', toggleApiKeyVisibility);
+    });
+</script>
+
 {% endblock %}
