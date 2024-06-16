@@ -4,6 +4,11 @@
 
 `If the EUHC Cinematic Universe allowed Jack Mead, Ed Bury, and I to do the umpiring assignments for EUMHC together at the same time. Then times that by 10 million. That is The BuzzBot`
 
+## A note to users and contributors
+
+This software and accompanying documentation has been developed specifically for [Edinburgh University Men's Hockey Club](www.euhc.co.uk).
+Much of the graphical interface and backend logic may not be applicable and/or relevant to other domains. 
+
 ## Abstract
 
 Students don't like umpiring. In an ideal world, every player at a university hockey club would never have to umpire
