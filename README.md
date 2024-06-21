@@ -26,14 +26,6 @@ constraints.
 ## Constraints, Heuristics, and Assumptions
 
 ### Heuristic: **GreedyFair** - Uniform assignment based on Team Ranking and Umpiring Ability
-The higher the team, the better the umpiring ability. If team $t_1$ is ranked higher than team $t_2$, then the umpiring ability of $t_1$ is greater than the umpiring ability of $t_2$.
-
-$$
-t_1 > t_2 \implies \text{UmpireAbility}(t_1) > \text{UmpireAbility}(t_2)
-$$
-
-
-### Heuristic: **GreedyFair** - Uniform assignment based on Team Ranking and Umpiring Ability
 
 The **GreedyFair** heuristic ensures that umpiring duties are distributed uniformly among teams based on their ranking and umpiring ability. The key assumption is that the higher-ranked teams with regard to their playing ability have better umpiring abilities. Thus, if team $t_1$ is ranked higher than team $t_2$, then the umpiring ability of $t_1$ is greater than the umpiring ability of $t_2$.
 
