@@ -7,7 +7,9 @@
 ## A note to users and contributors
 
 This software and accompanying documentation has been developed specifically for [Edinburgh University Men's Hockey Club](www.euhc.co.uk).
-Much of the graphical interface and backend logic may not be applicable and/or relevant to other domains. 
+Much of the graphical interface and backend logic may not be applicable and/or relevant to other domains. Anyone is more than welcome to use and edit the software in this repository for their own purposes. We encourage you to explore, modify, and adapt the code to fit your needs.
+
+For detailed information about using, copying, modifying, and distributing this software, please refer to the [LICENSE](./LICENSE) file in this repository.
 
 ## Abstract
 
@@ -23,12 +25,60 @@ constraints.
 
 ## Constraints, Heuristics, and Assumptions
 
-### Heuristic: Team Ranking and Umpiring Ability
+### Heuristic: **GreedyFair** - Uniform assignment based on Team Ranking and Umpiring Ability
 The higher the team, the better the umpiring ability. If team $t_1$ is ranked higher than team $t_2$, then the umpiring ability of $t_1$ is greater than the umpiring ability of $t_2$.
 
 $$
 t_1 > t_2 \implies \text{UmpireAbility}(t_1) > \text{UmpireAbility}(t_2)
 $$
+
+
+### Heuristic: **GreedyFair** - Uniform assignment based on Team Ranking and Umpiring Ability
+
+The **GreedyFair** heuristic ensures that umpiring duties are distributed uniformly among teams based on their ranking and umpiring ability. The key assumption is that the higher-ranked teams with regard to their playing ability have better umpiring abilities. Thus, if team $t_1$ is ranked higher than team $t_2$, then the umpiring ability of $t_1$ is greater than the umpiring ability of $t_2$.
+
+#### Team Selection Process
+
+1. **Initialisation**:
+  - Let $T$ be the set of all teams.
+  - Let $A(t)$ be the number of current assignments for team $t$.
+
+2. **Selection Criteria**:
+  - At each selection step, choose the team $t$ that satisfies:
+   $$
+    t = \arg\min_{t' \in T} A(t')
+   $$
+    Among the teams with the minimum number of current assignments, select the highest-ranked team.
+
+3. **Assignment**:
+  - Assign the selected team $t$ to the current umpiring duty.
+  - Increment the assignment count: $A(t) = A(t) + 1$.
+
+#### Mathematical Representation
+
+1. **Define**:
+  - $R(t)$: Rank of team $t$ (lower value means higher rank).
+  - $A(t)$: Number of assignments for team $t$.
+
+2. **Selection Function**:
+  - Let $T_{\min}$ be the set of teams with the minimum number of assignments:
+   $$
+    T_{\min} = \{ t \in T \mid A(t) = \min_{t' \in T} A(t') \}
+   $$
+
+  - Choose the team $t$ from $T_{\min}$ with the highest ranking:
+   $$
+    t = \arg\min_{t' \in T_{\min}} R(t')
+   $$
+
+3. **Update**:
+  - Assign team $t$ to the current umpiring duty.
+  - Update the number of assignments for team $t$:
+   $$
+    A(t) = A(t) + 1
+   $$
+
+By following this heuristic, the best umpiring team does not get assigned every match, ensuring a balanced distribution of umpiring duties across all teams.
 
 ### Constraint: Umpire Cannot Play and Umpire Simultaneously
 An umpire $u$ cannot umpire and play at the same time.

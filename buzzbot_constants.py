@@ -1,4 +1,3 @@
-import random
 import yaml
 
 from heuristics import SelectionFunction, GreedyFair
@@ -25,6 +24,7 @@ class BuzzBotConfiguration:
                 self.settings = yaml.safe_load(file) or {}
         except FileNotFoundError:
             # TODO - make these the default settings, not an empty dictionary.
+            print(f"[-] {self.config_file} not found, using default settings.")
             self.settings = {}
 
 
@@ -38,7 +38,6 @@ class BuzzBotConfiguration:
 
 
 # Singleton instantiation
-buzzbotConfiguration = BuzzBotConfiguration("configuration.yaml")
 
 
 def get_selection_criteria() -> SelectionFunction:

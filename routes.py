@@ -5,7 +5,7 @@ from flask import Flask, render_template, url_for, request, redirect
 from werkzeug.utils import secure_filename
 
 import DistanceMatrixAPI
-from buzzbot_constants import buzzbotConfiguration
+from buzzbot_constants import BuzzBotConfiguration
 import webbrowser
 import threading
 import buzzbot
@@ -13,6 +13,8 @@ import buzzbot_constants
 import utils
 
 app = Flask(__name__)
+
+buzzbotConfiguration = BuzzBotConfiguration("configuration.yaml")
 
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['ALLOWED_EXTENSIONS'] = {'csv'}
