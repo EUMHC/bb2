@@ -37,9 +37,7 @@ The **GreedyFair** heuristic ensures that umpiring duties are distributed unifor
 
 2. **Selection Criteria**:
   - At each selection step, choose the team $t$ that satisfies:
-   $$
-    t = \arg\min_{t' \in T} A(t')
-   $$
+   $$t = \arg\min_{t' \in T} A(t')$$
     Among the teams with the minimum number of current assignments, select the highest-ranked team.
 
 3. **Assignment**:
@@ -54,21 +52,15 @@ The **GreedyFair** heuristic ensures that umpiring duties are distributed unifor
 
 2. **Selection Function**:
   - Let $T_{\min}$ be the set of teams with the minimum number of assignments:
-   $$
-    T_{\min} = \{ t \in T \mid A(t) = \min_{t' \in T} A(t') \}
-   $$
+   $$T_{\min} = \{ t \in T \mid A(t) = \min_{t' \in T} A(t') \}$$
 
   - Choose the team $t$ from $T_{\min}$ with the highest ranking:
-   $$
-    t = \arg\min_{t' \in T_{\min}} R(t')
-   $$
+   $$t = \arg\min_{t' \in T_{\min}} R(t')$$
 
 3. **Update**:
   - Assign team $t$ to the current umpiring duty.
   - Update the number of assignments for team $t$:
-   $$
-    A(t) = A(t) + 1
-   $$
+   $$A(t) = A(t) + 1$$
 
 By following this heuristic, the best umpiring team does not get assigned every match, ensuring a balanced distribution of umpiring duties across all teams.
 
