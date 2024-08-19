@@ -1,6 +1,8 @@
-# The BuzzBot
+# BuzzBot2
 
 [![wakatime](https://wakatime.com/badge/user/eb310a2d-fc37-4859-8755-b6b88930af57/project/018cdb8d-3c59-4706-8b4c-4fb2808b90c9.svg)](https://wakatime.com/badge/user/eb310a2d-fc37-4859-8755-b6b88930af57/project/018cdb8d-3c59-4706-8b4c-4fb2808b90c9)
+
+<p align="center"><b>Blazingly fast (sorta), disgustingly rigorous umpiring assignment system for Edinburgh University Men's Hockey Club</b></p>
 
 `If the EUHC Cinematic Universe allowed Jack Mead, Ed Bury, and I to do the umpiring assignments for EUMHC together at the same time. Then times that by 10 million. That is The BuzzBot`
 
@@ -99,53 +101,3 @@ $$
 Umpires travel to and from games in cars.
 
 
-
-
-## Prerequisites
-
-Make sure you have the following installed on your system:
-
-- Python (>=3.6)
-- pip (Python package installer)
-- Virtualenv (optional but recommended)
-
-## Installation
-
-### Clone the Repository
-
-```bash
-git clone https://github.com/CallumAlexander/The-BuzzBot-Python.git
-cd The-BuzzBot-Python
-```
-
-### Install Dependencies
-
-Install the required Python packages using pip:
-
-```bash
-pip install -r requirements.txt
-```
-
-
-## Running the Application
-
-To start the Flask application, use the following command:
-
-```bash
-flask run
-```
-
-By default, the application will run on `http://127.0.0.1:5000/`. Navigate to there in your browser.
-
-## To-do list of things to do
-- [x] Prioritised covering selection for teams playing on the same day
-- [x] Doesn't select the playing team as the covering team
-- [x] Doesn't select teams that are playing in overlapping times
-- [x] Handles requiring no umpires and requiring 2 umpires
-- [x] Add location to fixtures
-  - [x] Integrate travel time calculation and overlap checking using Google Maps API(?)
-- [ ] Handle having a teams as an away team in a fixture
-- [ ] Heuristic involving confidence metric to select the best team to umpire rather than a greedy heuristic
-- [ ] Rewrite as a proper constraint search problem.
-- [ ] Handle multiple team assignments for a single game (1s and 2s provide an umpire each for a match - only when 2
-  umpires are required).
