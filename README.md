@@ -22,22 +22,23 @@
 
 ## A note to users and contributors
 
-This software and accompanying documentation has been developed specifically for [Edinburgh University Men's Hockey Club](www.euhc.co.uk).
-Much of the graphical interface and backend logic may not be applicable and/or relevant to other domains. Anyone is more than welcome to use and edit the software in this repository for their own purposes. We encourage you to explore, modify, and adapt the code to fit your needs.
+This software and accompanying documentation has been developed specifically for [Edinburgh University Men's Hockey Club](https://www.euhc.co.uk).
+Much of the interface and backend logic may not be applicable and/or relevant to other domains. Anyone is more than welcome to use and edit the software in this repository for their own purposes. We encourage you to explore, modify, and adapt the code to fit your needs.
 
 For detailed information about using, copying, modifying, and distributing this software, please refer to the [LICENSE](./LICENSE) file in this repository.
 
 ## Abstract
 
-Students don't like umpiring. In an ideal world, every player at a university hockey club would never have to umpire
-a game during their time at the club. Alas, this is not the case. At Edinburgh University Men's Hockey Club, the club
-policy
-is that all umpires are players; the two are not mutually exclusive like they are at other clubs. When priority is given
-to ensure all players are able to put playing first, a system for assigning umpires to fixtures can be modelled. Given a
-uniform spread of umpires across all playing teams, assignments can be given to a team rather than an individual. The
-system
-presented, called The BuzzBot, successfully assigns 'covering teams' to fixtures based on set assumptions and
-constraints.
+Students don't like umpiring. In an ideal world, every player at a university
+hockey club would never have to umpire a game during their time at the club.
+Alas, this is not the case. At Edinburgh University Men's Hockey Club, the club
+policy is that all umpires are players; the two are not mutually exclusive like
+they are at other clubs. When priority is given to ensure all players are able
+to put playing first, a system for assigning umpires to fixtures can be
+modelled. Given a uniform spread of umpires across all playing teams,
+assignments can be given to a team rather than an individual. The system
+presented, called The BuzzBot, successfully assigns 'covering teams' to
+fixtures based on set assumptions and constraints.
 
 ## How it works
 
