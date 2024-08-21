@@ -126,3 +126,6 @@ However, Python as a language is slow. See [here.](https://medium.com/thedeephub
 The original BuzzBot was a flask application completely isolated from the club's operational workflow. Users had to download a csv copy of the data or enter it manually into the interface.
 
 BuzzBot2 is fully integrated and faster.
+
+## People 
+- **Callum Alexander**, Lead Dev, EUMHC VP 2022/23, EUMHC Publicity + Website 2020+1/22
