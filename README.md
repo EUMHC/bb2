@@ -99,6 +99,7 @@ An umpire cannot umpire a fixture if the time between the umpiring fixture and t
 $$
 A_{\text{end}} + T_{AB} \leq B_{\text{start}}
 $$
+
 $$
 B_{\text{end}} + T_{BA} \leq A_{\text{start}}
 $$
