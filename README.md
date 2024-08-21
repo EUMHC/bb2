@@ -128,4 +128,4 @@ The original BuzzBot was a flask application completely isolated from the club's
 BuzzBot2 is fully integrated and faster.
 
 ## People 
-- **Callum Alexander**, Lead Dev, EUMHC VP 2022/23, EUMHC Publicity + Website 2020+1/22
+- [**Callum Alexander**](https://github.com/CallumAlexander), lead BuzzBot dev and the dude behind the idea, EUMHC VP 2022/23, EUMHC Publicity + Website 2020+1/22
