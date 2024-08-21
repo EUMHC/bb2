@@ -35,8 +35,7 @@ class GoogleSheetManager:
             "https://www.googleapis.com/auth/spreadsheets",
             "https://www.googleapis.com/auth/drive",
         ]
-        logging.info("Loading credentials from file: %s",
-                     self.credentials_file)
+        logging.info("Loading credentials from file: %s", self.credentials_file)
         credentials = None
         with tqdm(
             total=100,
@@ -77,16 +76,12 @@ class GoogleSheetManager:
             worksheet_name (str): The name of the worksheet to write data to.
             fixtures (List[Fixture]): A list of Fixture objects with covering_team assignments to be written to the sheet.
         """
-        logging.info(
-            "Preparing to write assignments to worksheet: %s", worksheet_name)
+        logging.info("Preparing to write assignments to worksheet: %s", worksheet_name)
         worksheet = self.get_worksheet(worksheet_name)
 
-        # Identify unique home teams (these will be the columns)
-        # NOTE: I could do this as the config teams but thought this easier.
         teams = sorted({fixture.home for fixture in fixtures})
         logging.info("Identified teams: %s", teams)
 
-        # Initialize an empty df with the columns as team names
         df = pd.DataFrame(columns=["Day", "Date"] + teams)
 
         current_date = None
@@ -97,11 +92,10 @@ class GoogleSheetManager:
             fixture_day = fixture.start_time.strftime("%A")
 
             if fixture.start_time.date() != current_date:
-                # If there's a current row being processed, append it to the df
+                # If there's a current row being processed, append it to the DataFrame
                 if row_data:
                     # Append the row with the fixture info
-                    df = pd.concat(
-                        [df, pd.DataFrame([row_data])], ignore_index=True)
+                    df = pd.concat([df, pd.DataFrame([row_data])], ignore_index=True)
                     # Append the row with the covering team info directly below the fixture info
                     covering_row = {key: "" for key in df.columns}
                     covering_row["Date"] = "Buzzbot cover recommendation"
@@ -111,8 +105,18 @@ class GoogleSheetManager:
                     df = pd.concat(
                         [df, pd.DataFrame([covering_row])], ignore_index=True
                     )
-                    # Add two blank rows after the covering row
-                    # HACK: bookie but it works
+                    # Append the row with the eligible teams info directly below the covering team info
+                    eligible_row = {key: "" for key in df.columns}
+                    eligible_row["Date"] = "All eligible covering teams"
+                    for team in teams:
+                        if team in row_data:
+                            eligible_row[team] = ", ".join(
+                                row_data.get(team + "_eligible", [])
+                            )
+                    df = pd.concat(
+                        [df, pd.DataFrame([eligible_row])], ignore_index=True
+                    )
+                    # Add two blank rows after the eligible teams row
                     df = pd.concat(
                         [df, pd.DataFrame([{}]), pd.DataFrame([{}])], ignore_index=True
                     )
@@ -121,35 +125,40 @@ class GoogleSheetManager:
                 current_date = fixture.start_time.date()
                 row_data = {"Day": fixture_day, "Date": fixture_date}
 
-            # Build the fixture information
             fixture_info = f"{fixture.away} {fixture.start_time.strftime('%H:%M')} PB @ {fixture.location}"
 
-            # Assign the fixture information and covering team to the correct column
             row_data[fixture.home] = fixture_info
             row_data[fixture.home + "_cover"] = fixture.covering_team
+            row_data[fixture.home + "_eligible"] = fixture.eligible_teams
 
         # Append the last processed row
         if row_data:
             df = pd.concat([df, pd.DataFrame([row_data])], ignore_index=True)
             covering_row = {key: "" for key in df.columns}
+            covering_row["Date"] = "Buzzbot cover recommendation"
             for team in teams:
                 if team in row_data:
                     covering_row[team] = row_data[team + "_cover"]
-            df = pd.concat([df, pd.DataFrame([covering_row])],
-                           ignore_index=True)
-            # Add two blank rows after the last covering row
+            df = pd.concat([df, pd.DataFrame([covering_row])], ignore_index=True)
+
+            eligible_row = {key: "" for key in df.columns}
+            eligible_row["Date"] = "All eligible covering teams"
+            for team in teams:
+                if team in row_data:
+                    eligible_row[team] = ", ".join(row_data.get(team + "_eligible", []))
+            df = pd.concat([df, pd.DataFrame([eligible_row])], ignore_index=True)
+            # Add two blank rows after the last eligible teams row
             df = pd.concat(
                 [df, pd.DataFrame([{}]), pd.DataFrame([{}])], ignore_index=True
             )
 
-        # Remove any columns that contain "cover" in the name
-        # HACK: ONly good way I've found of solving this problem from the 23 seconds I spent on it
-        df = df.drop(columns=[col for col in df.columns if "cover" in col])
+        # HACK: Remove any columns that contain "cover" or "eligible" in the name
+        df = df.drop(
+            columns=[col for col in df.columns if "cover" in col or "eligible" in col]
+        )
 
-        # Write the df to the sheet all at once
         logging.info("Writing DataFrame to worksheet: %s", worksheet_name)
-        worksheet.update([df.columns.values.tolist()] +
-                         df.fillna("").values.tolist())
+        worksheet.update([df.columns.values.tolist()] + df.fillna("").values.tolist())
         logging.info(
             "Assignments written successfully to worksheet: %s", worksheet_name
         )
@@ -168,8 +177,7 @@ class GoogleSheetManager:
         worksheet = self.get_worksheet(worksheet_name)
         data = worksheet.get_all_records()
         df = pd.DataFrame(data)
-        logging.info("Data read successfully from worksheet: %s",
-                     worksheet_name)
+        logging.info("Data read successfully from worksheet: %s", worksheet_name)
         return df
 
     def read_sheet_as_fixtures(self, worksheet_name):
@@ -185,13 +193,11 @@ class GoogleSheetManager:
             fixture = Fixture(
                 home_=row["uni_team"],
                 away_=row["opposition"],
-                start_time_=datetime.strptime(
-                    row["start_time"], "%Y-%m-%d %H:%M:%S"),
+                start_time_=datetime.strptime(row["start_time"], "%Y-%m-%d %H:%M:%S"),
                 umpires_required_=int(row["umpires_needed"]),
                 location_=row["location"],
             )
             fixtures.append(fixture)
 
-        logging.info(
-            "Fixtures read successfully from worksheet: %s", worksheet_name)
+        logging.info("Fixtures read successfully from worksheet: %s", worksheet_name)
         return fixtures
