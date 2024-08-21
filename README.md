@@ -10,6 +10,16 @@
 
 </div>
 
+## Edinburgh Uni Contributers! - Read this!
+
+1. **Fork this repo**
+2. **Clone your fork to your machine**
+3. **Create a new branch on your newly cloned fork**
+4. **Implement your changes**
+5. **Commit you changes**
+6. **Push your changes**
+7. **Open PR on _THIS_ repo**
+
 ## A note to users and contributors
 
 This software and accompanying documentation has been developed specifically for [Edinburgh University Men's Hockey Club](www.euhc.co.uk).
