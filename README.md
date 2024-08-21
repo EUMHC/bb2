@@ -120,3 +120,8 @@ Umpires travel to and from games in cars.
 Umpiring assignments is a bit like solving sudoku. Humans can do them just fine, but computers can do it faster, more efficiently, and can be programmed to get it verifiably correct every time. This is especially true with really large sudoku puzzles and long lists of fixtures. **Blazingly fast doesn't come close to describing the difference in speed between the BuzzBot2 and a Vice President solving umpiring assignments.**
 
 However, Python as a language is slow. See [here.](https://medium.com/thedeephub/but-why-python-is-so-slow-da1a4fb9be92)
+### Why is it BuzzBot2? What happened to BuzzBot '1'? 
+
+The original BuzzBot was a flask application completely isolated from the club's operational workflow. Users had to download a csv copy of the data or enter it manually into the interface.
+
+BuzzBot2 is fully intergrated and faster.
