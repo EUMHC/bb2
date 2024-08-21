@@ -6,10 +6,10 @@ from tqdm import tqdm
 import requests
 import json
 from buzzbot_constants import buzzbotConfiguration
+from models import Fixture
 
 
 class DistanceMatrixLocation:
-
     def __init__(self, id_: str, lat_: float, long_: float):
         self.id = id_
         self.lat = lat_
@@ -23,10 +23,11 @@ class DistanceMatrixLocation:
 
 
 class DistanceMatrixInterface:
-
     def __init__(self, API_KEY_: str):
         self.API_KEY: str = API_KEY_
-        self.endpoint: str = "https://api.distancematrix.ai/maps/api/distancematrix/json?"
+        self.endpoint: str = (
+            "https://api.distancematrix.ai/maps/api/distancematrix/json?"
+        )
         self.locations: [DistanceMatrixLocation] = []
         self.request_url: str = ""
         self.json_response: dict = {}
@@ -53,8 +54,11 @@ class DistanceMatrixInterface:
         return len(self.cache)
 
     def import_from_LocationManager(self, location_manager_dict: dict) -> None:
-        self.locations = [DistanceMatrixLocation(location_id, location_data[0], location_data[1]) for
-                          location_id, location_data in location_manager_dict.items()]
+        self.locations = [
+            DistanceMatrixLocation(
+                location_id, location_data[0], location_data[1])
+            for location_id, location_data in location_manager_dict.items()
+        ]
 
     def build_distance_matrix_request(self, origin, destination):
         origins_str: str = origin.to_request_format()
@@ -70,18 +74,20 @@ class DistanceMatrixInterface:
                 self.json_response = response.json()
             else:
                 print(
-                    f"[-] ERROR: fetching data issue when an API request has been made; status code {response.status_code}")
+                    f"[-] ERROR: fetching data issue when an API request has been made; status code {response.status_code}"
+                )
                 return None
         except Exception as e:
             print(
-                f"[-] ERROR: an error when making a request to {self.request_url} has occurred. The following exception message has been thrown: {e}")
+                f"[-] ERROR: an error when making a request to {self.request_url} has occurred. The following exception message has been thrown: {e}"
+            )
             return None
 
     def parse_response(self):
         try:
-            row = self.json_response['rows'][0]
-            element = row['elements'][0]
-            travel_time = element['duration']['value']
+            row = self.json_response["rows"][0]
+            element = row["elements"][0]
+            travel_time = element["duration"]["value"]
             return travel_time
         except (IndexError, KeyError):
             print("[-] ERROR: Unable to parse response correctly.")
@@ -92,7 +98,9 @@ class DistanceMatrixInterface:
         travel_times = {}
         for origin, destination in tqdm(itertools.combinations(self.locations, 2)):
             key = f"{origin.to_request_format()}_{destination.to_request_format()}"
-            reverse_key = f"{destination.to_request_format()}_{origin.to_request_format()}"
+            reverse_key = (
+                f"{destination.to_request_format()}_{origin.to_request_format()}"
+            )
 
             if key in self.cache:
                 print(f"[+] Using cached value for {key}")
@@ -101,7 +109,8 @@ class DistanceMatrixInterface:
                 print(f"[+] Using cached value for {reverse_key}")
                 travel_times[key] = self.cache[reverse_key]
             else:
-                print(f"[*] Handling {origin} and {destination} location request")
+                print(
+                    f"[*] Handling {origin} and {destination} location request")
                 self.build_distance_matrix_request(origin, destination)
                 self.make_request()
                 travel_time = self.parse_response()
@@ -112,7 +121,6 @@ class DistanceMatrixInterface:
 
 
 class LocationManager:
-
     def __init__(self):
         self.locations = {}
         self.SOURCE = "locations.csv"
@@ -124,9 +132,11 @@ class LocationManager:
     def get_location(self, name: str) -> (float, float):
         location = self.locations.get(name)
         if location is None:
-            raise KeyError(f"Location with name '{name}' not found in the Location Manager. Have you spelt the "
-                           f"location correctly? Please refer to locations.csv file for correct locations and "
-                           f"spellings.")
+            raise KeyError(
+                f"Location with name '{name}' not found in the Location Manager. Have you spelt the "
+                f"location correctly? Please refer to locations.csv file for correct locations and "
+                f"spellings."
+            )
         return location
 
     def get_all_locations(self) -> dict:
@@ -139,10 +149,13 @@ class LocationManager:
         return self.locations.values()
 
     def bootstrap(self):
-        with open(self.SOURCE, mode='r', encoding='utf-8') as source:
+        with open(self.SOURCE, mode="r", encoding="utf-8") as source:
             reader = csv.DictReader(source)
             for row in reader:
-                self.add_location(row['LocationName'], float(row['Latitude']), float(row['Longitude']))
+                self.add_location(
+                    row["LocationName"], float(
+                        row["Latitude"]), float(row["Longitude"])
+                )
 
     def return_matchday_location_subdictionary(self, locations: [str]) -> dict:
         """
