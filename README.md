@@ -29,6 +29,15 @@ system
 presented, called The BuzzBot, successfully assigns 'covering teams' to fixtures based on set assumptions and
 constraints.
 
+## How it works
+
+When the program is run:
+1. It downloads the latest version of the club's fixtures from the Fixtures Google Sheet document.
+2. It processes the raw fixtures data and assigns the best covering team based on the Constraints, Heuristics, and Assumptions detailed below.
+3. It writes the fixtures and their covering teams to the 'Assignments' sheet in the Fixtures Google Sheet document in the traditional 'fixtures umpiring combo doc' style.
+
+Current benchmark performance is *6.76 seconds* of total runtime for ~60 fixtures. Blazingly fast (sorta)!
+
 ## Constraints, Heuristics, and Assumptions
 
 ### Heuristic: **GreedyFair** - Uniform assignment based on Team Ranking and Umpiring Ability
