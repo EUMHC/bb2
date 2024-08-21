@@ -7,6 +7,9 @@ class BuzzBotConfiguration:
     _instance = None
 
     def __new__(cls, *args, **kwargs):
+        # NOTE: We want the config to be a singleton. I think this is how you implement
+        # singleton checks in Python.
+        # TODO: Figure out if this is best practice for a singleton.
         if not cls._instance:
             cls._instance = super(BuzzBotConfiguration, cls).__new__(cls)
             cls._instance.__initialized = False

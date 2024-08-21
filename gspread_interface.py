@@ -69,6 +69,8 @@ class GoogleSheetManager:
         return worksheet
 
     def write_assignments(self, worksheet_name, fixtures):
+        # TODO: This method is extraordinarily long and probably needs broken up.
+        # NOTE: You could probably write a new class called SheetWriter that just contains all of the functions for writing to the sheet.
         """
         Writes fixture assignments to the specified worksheet in the required structure using a pandas DataFrame. This is a really complex function that is hardcoded to manipulate a Pandas DataFrame precisely so that it can be written to the target Google Sheet.
 
@@ -164,6 +166,7 @@ class GoogleSheetManager:
         )
 
     def read_sheet_as_dataframe(self, worksheet_name) -> pd.DataFrame:
+        # TODO: This method has probably depreceated but we'll keep it for now?
         """
         Reads data from the specified worksheet and returns it as a pandas DF.
 
