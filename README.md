@@ -113,4 +113,10 @@ $$
 ### Assumption: Mode of Travel
 Umpires travel to and from games in cars.
 
+## Frequently Asked Questions
 
+### Why is it 'Blazingly Fast (sorta)'? 
+
+Umpiring assignments is a bit like solving sudoku. Humans can do them just fine, but computers can do it faster, more efficiently, and can be programmed to get it verifiably correct every time. This is especially true with really large sudoku puzzles and long lists of fixtures. **Blazingly fast doesn't come close to describing the difference in speed between the BuzzBot2 and a Vice President solving umpiring assignments.**
+
+However, Python as a language is slow. See [here.](https://medium.com/thedeephub/but-why-python-is-so-slow-da1a4fb9be92)
