@@ -124,4 +124,4 @@ However, Python as a language is slow. See [here.](https://medium.com/thedeephub
 
 The original BuzzBot was a flask application completely isolated from the club's operational workflow. Users had to download a csv copy of the data or enter it manually into the interface.
 
-BuzzBot2 is fully intergrated and faster.
+BuzzBot2 is fully integrated and faster.
