@@ -6,7 +6,7 @@
 
 <p><b>Blazingly fast (sorta), disgustingly rigorous umpiring assignment system for Edinburgh University Men's Hockey Club</b></p>
 
-`If the EUHC Cinematic Universe allowed Jack Mead, Ed Bury, and I to do the umpiring assignments for EUMHC together at the same time. Then times that by 10 million. That is The BuzzBot`
+`"If the EUHC Cinematic Universe allowed Jack Mead, Ed Bury, and I to do the umpiring assignments for EUMHC together at the same time. Then times that by 10 million. That is The BuzzBot" - Cal Zander, 2024`
 
 </div>
 
