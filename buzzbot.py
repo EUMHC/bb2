@@ -17,8 +17,7 @@ logger = logging.getLogger("TheBuzzBot Logger")
 logger.setLevel(logging.DEBUG)
 fh = logging.FileHandler("buzzbot.log", mode="a")  # "a" for append
 fh.setLevel(logging.DEBUG)
-formatter = logging.Formatter(
-    "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 fh.setFormatter(formatter)
 logger.addHandler(fh)
 
@@ -62,11 +61,14 @@ class BuzzBot:
         teams_: [str],
         umpiring_count_: dict,
         criteria_: SelectionFunction,
+        locations_df=None,
     ):
         self.matches: [Fixture] = matches_
         self.teams: [str] = teams_
         self.umpiring_count: dict = umpiring_count_
-        self.location_manager: LocationManager = LocationManager()
+        self.location_manager: LocationManager = LocationManager(
+            df=(locations_df if locations_df is not None else None)
+        )
         self.api: DistanceMatrixInterface = DistanceMatrixInterface(
             buzzbotConfiguration.settings["distance_matrix_ai"]
         )
@@ -108,8 +110,7 @@ class BuzzBot:
         :return: a dictionary where key is the date, and the values are list of Fixture objects
         """
         self.matches.sort(key=lambda x: x.start_time.date())
-        grouped_matches = groupby(
-            self.matches, key=lambda x: x.start_time.date())
+        grouped_matches = groupby(self.matches, key=lambda x: x.start_time.date())
         return {date: list(matches) for date, matches in grouped_matches}
 
     def assign_covering_teams(self, print_results: bool) -> None:
@@ -141,8 +142,7 @@ class BuzzBot:
         match.covering_team = selected_team
         if selected_team != "No available umpire":
             self.umpiring_count[selected_team] = (
-                self.umpiring_count.get(
-                    selected_team, 0) + match.umpires_required
+                self.umpiring_count.get(selected_team, 0) + match.umpires_required
             )
 
     def print_results(self) -> None:

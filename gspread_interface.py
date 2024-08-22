@@ -236,3 +236,19 @@ class GoogleSheetManager:
         except (ValueError, TypeError) as e:
             logging.error(f"Error parsing date or time: {e}")
             return None
+
+    def read_locations_sheet(self, worksheet_name="Locations") -> pd.DataFrame:
+        """
+        Reads the specified worksheet (default 'Locations') and returns it as a pandas DataFrame.
+
+        :param worksheet_name: The name of the worksheet to read data from.
+        :return: A pandas DataFrame containing the location data.
+        """
+        logging.info("Reading location data from worksheet: %s", worksheet_name)
+        worksheet = self.get_worksheet(worksheet_name)
+        data = worksheet.get_all_records()
+        df = pd.DataFrame(data)
+        logging.info(
+            "Location data read successfully from worksheet: %s", worksheet_name
+        )
+        return df

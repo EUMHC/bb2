@@ -1,6 +1,7 @@
 import os
 import csv
 import itertools
+import pandas as pd
 from tqdm import tqdm
 
 import requests
@@ -55,8 +56,7 @@ class DistanceMatrixInterface:
 
     def import_from_LocationManager(self, location_manager_dict: dict) -> None:
         self.locations = [
-            DistanceMatrixLocation(
-                location_id, location_data[0], location_data[1])
+            DistanceMatrixLocation(location_id, location_data[0], location_data[1])
             for location_id, location_data in location_manager_dict.items()
         ]
 
@@ -109,8 +109,7 @@ class DistanceMatrixInterface:
                 print(f"[+] Using cached value for {reverse_key}")
                 travel_times[key] = self.cache[reverse_key]
             else:
-                print(
-                    f"[*] Handling {origin} and {destination} location request")
+                print(f"[*] Handling {origin} and {destination} location request")
                 self.build_distance_matrix_request(origin, destination)
                 self.make_request()
                 travel_time = self.parse_response()
@@ -121,10 +120,19 @@ class DistanceMatrixInterface:
 
 
 class LocationManager:
-    def __init__(self):
+    def __init__(self, df: pd.DataFrame = None):
+        """
+        Initializes the LocationManager with an optional DataFrame.
+        If no DataFrame is provided, the locations will be populated from the 'locations.csv' file.
+
+        :param df: A pandas DataFrame containing location data with columns 'LocationName', 'Latitude', and 'Longitude'.
+        """
         self.locations = {}
         self.SOURCE = "locations.csv"
-        self.bootstrap()
+        if df is not None:
+            self.populate_from_dataframe(df)
+        else:
+            self.bootstrap()
 
     def add_location(self, name_: str, latitude_: float, longitude_: float) -> None:
         self.locations[name_] = (latitude_, longitude_)
@@ -143,24 +151,38 @@ class LocationManager:
         return self.locations
 
     def get_all_location_names(self) -> [str]:
-        return self.locations.keys()
+        return list(self.locations.keys())
 
     def get_all_coords_as_list(self) -> [(float, float)]:
-        return self.locations.values()
+        return list(self.locations.values())
 
     def bootstrap(self):
+        """
+        Populates the LocationManager from the default CSV file.
+        """
         with open(self.SOURCE, mode="r", encoding="utf-8") as source:
             reader = csv.DictReader(source)
             for row in reader:
                 self.add_location(
-                    row["LocationName"], float(
-                        row["Latitude"]), float(row["Longitude"])
+                    row["LocationName"], float(row["Latitude"]), float(row["Longitude"])
                 )
+
+    def populate_from_dataframe(self, df: pd.DataFrame):
+        """
+        Populates the LocationManager with data from a pandas DataFrame.
+
+        :param df: A pandas DataFrame containing location data with columns 'LocationName', 'Latitude', and 'Longitude'.
+        """
+        for _, row in df.iterrows():
+            self.add_location(
+                row["LocationName"], float(row["Latitude"]), float(row["Longitude"])
+            )
 
     def return_matchday_location_subdictionary(self, locations: [str]) -> dict:
         """
-        Returns key value pairs (location, latlongs) of the match day locations only
-        :param locations: the list of location names for match day fixtures
-        :return: dictionary of location names and latlong values
+        Returns key-value pairs (location, latlongs) of the match day locations only.
+
+        :param locations: The list of location names for match day fixtures.
+        :return: Dictionary of location names and latlong values.
         """
         return {l: self.get_location(l) for l in locations}

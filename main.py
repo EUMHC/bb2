@@ -14,13 +14,20 @@ def main():
         sheet_name=buzzbotConfiguration.settings["google_sheet_doc_name"],
     )
     matches = manager.read_sheet_as_fixtures("Fixtures List")
+    locations = manager.read_locations_sheet("Locations")
 
     # Compute
     compute_start_time = time.time()
     teams = buzzbotConfiguration.settings["teams"]
     umpiring_count = {team: 0 for team in teams}
     selection_criteria = buzzbot_constants.get_selection_criteria()
-    bot = buzzbot.BuzzBot(matches, teams, umpiring_count, criteria_=selection_criteria)
+    bot = buzzbot.BuzzBot(
+        matches,
+        teams,
+        umpiring_count,
+        criteria_=selection_criteria,
+        locations_df=locations,
+    )
     bot.assign_covering_teams(print_results=False)
 
     # Sort
