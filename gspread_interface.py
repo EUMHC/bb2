@@ -2,9 +2,10 @@ import gspread
 from google.oauth2.service_account import Credentials
 import pandas as pd
 from models import Fixture
-from datetime import datetime
+from datetime import datetime, time
 import logging
 from tqdm import tqdm
+from dateutil import parser
 
 # NOTE: the file/class needs a lot of logging because I want to know what is happening.
 logging.basicConfig(
@@ -103,7 +104,10 @@ class GoogleSheetManager:
                     covering_row["Date"] = "Buzzbot cover recommendation"
                     for team in teams:
                         if team in row_data:
-                            covering_row[team] = row_data[team + "_cover"]
+                            covering_row[team] = (
+                                f"{row_data[team + '_cover']} cover"
+                                f"\n({row_data[team + '_umpires_required']}x required)"
+                            )
                     df = pd.concat(
                         [df, pd.DataFrame([covering_row])], ignore_index=True
                     )
@@ -132,6 +136,7 @@ class GoogleSheetManager:
             row_data[fixture.home] = fixture_info
             row_data[fixture.home + "_cover"] = fixture.covering_team
             row_data[fixture.home + "_eligible"] = fixture.eligible_teams
+            row_data[fixture.home + "_umpires_required"] = fixture.umpires_required
 
         # Append the last processed row
         if row_data:
@@ -140,7 +145,10 @@ class GoogleSheetManager:
             covering_row["Date"] = "Buzzbot cover recommendation"
             for team in teams:
                 if team in row_data:
-                    covering_row[team] = row_data[team + "_cover"]
+                    covering_row[team] = (
+                        f"{row_data[team + '_cover']} cover"
+                        f"\n({row_data[team + '_umpires_required']}x required)"
+                    )
             df = pd.concat([df, pd.DataFrame([covering_row])], ignore_index=True)
 
             eligible_row = {key: "" for key in df.columns}
@@ -156,7 +164,11 @@ class GoogleSheetManager:
 
         # HACK: Remove any columns that contain "cover" or "eligible" in the name
         df = df.drop(
-            columns=[col for col in df.columns if "cover" in col or "eligible" in col]
+            columns=[
+                col
+                for col in df.columns
+                if "cover" in col or "eligible" in col or "umpire" in col
+            ]
         )
 
         logging.info("Writing DataFrame to worksheet: %s", worksheet_name)
@@ -193,10 +205,11 @@ class GoogleSheetManager:
 
         fixtures = []
         for row in data:
+            start_time = self.combine_date_and_time(row["date"], row["pushback_time"])
             fixture = Fixture(
                 home_=row["uni_team"],
                 away_=row["opposition"],
-                start_time_=datetime.strptime(row["start_time"], "%Y-%m-%d %H:%M:%S"),
+                start_time_=start_time,
                 umpires_required_=int(row["umpires_needed"]),
                 location_=row["location"],
             )
@@ -204,3 +217,22 @@ class GoogleSheetManager:
 
         logging.info("Fixtures read successfully from worksheet: %s", worksheet_name)
         return fixtures
+
+    def combine_date_and_time(self, date_str: str, time_str: str):
+        """
+        Combines a date string and a time string into a single datetime object.
+
+        Parameters:
+            date_str (str): The date part as a string.
+            time_str (str): The time part as a string.
+
+        Returns:
+            datetime: A combined datetime object.
+        """
+        try:
+            parsed_date = parser.parse(date_str).date()
+            parsed_time = parser.parse(time_str).time()
+            return datetime.combine(parsed_date, parsed_time)
+        except (ValueError, TypeError) as e:
+            logging.error(f"Error parsing date or time: {e}")
+            return None

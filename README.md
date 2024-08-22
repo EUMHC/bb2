@@ -22,10 +22,15 @@
 
 ## A note to users and contributors
 
-This software and accompanying documentation has been developed specifically for [Edinburgh University Men's Hockey Club](https://www.euhc.co.uk).
-Much of the interface and backend logic may not be applicable and/or relevant to other domains. Anyone is more than welcome to use and edit the software in this repository for their own purposes. We encourage you to explore, modify, and adapt the code to fit your needs.
+This software and accompanying documentation has been developed specifically
+for [Edinburgh University Men's Hockey Club](https://www.euhc.co.uk). Much of
+the interface and backend logic may not be applicable and/or relevant to other
+domains. Anyone is more than welcome to use and edit the software in this
+repository for their own purposes. We encourage you to explore, modify, and
+adapt the code to fit your needs.
 
-For detailed information about using, copying, modifying, and distributing this software, please refer to the [LICENSE](./LICENSE) file in this repository.
+For detailed information about using, copying, modifying, and distributing this
+software, please refer to the [LICENSE](./LICENSE) file in this repository.
 
 ## Abstract
 
@@ -45,7 +50,8 @@ fixtures based on set assumptions and constraints.
 When the program is run:
 1. It downloads the latest version of the club's fixtures from the Fixtures Google Sheet document.
 2. It processes the raw fixtures data and assigns the best covering team based on the Constraints, Heuristics, and Assumptions detailed below.
-3. It writes the fixtures and their covering teams to the 'Assignments' sheet in the Fixtures Google Sheet document in the traditional 'fixtures umpiring combo doc' style.
+3. It writes the fixtures and their covering teams to the 'Assignments' sheet in the Fixtures Google Sheet document in the traditional 'fixtures umpiring
+combo doc' style.
 
 Current benchmark performance is *6.76 seconds* of total runtime for ~60 fixtures. Blazingly fast (sorta)!
 

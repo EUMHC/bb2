@@ -8,12 +8,14 @@ from buzzbot_constants import buzzbotConfiguration
 def main():
     total_start_time = time.time()
 
+    # Read
     manager = gspread_interface.GoogleSheetManager(
         credentials_file=buzzbotConfiguration.settings["google_credentials_filename"],
         sheet_name=buzzbotConfiguration.settings["google_sheet_doc_name"],
     )
     matches = manager.read_sheet_as_fixtures("Fixtures List")
 
+    # Compute
     compute_start_time = time.time()
     teams = buzzbotConfiguration.settings["teams"]
     umpiring_count = {team: 0 for team in teams}
@@ -21,10 +23,12 @@ def main():
     bot = buzzbot.BuzzBot(matches, teams, umpiring_count, criteria_=selection_criteria)
     bot.assign_covering_teams(print_results=False)
 
+    # Sort
     games = bot.matches
     games.sort(key=lambda x: x.start_time)
     compute_end_time = time.time()
 
+    # Write
     manager.write_assignments("Assignments", games)
 
     total_end_time = time.time()
